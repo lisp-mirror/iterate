@@ -2337,11 +2337,25 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
   (mapc #'local-binding-check forms)
   (return-code :final-protected (copy-list forms)))
 
-;;; (IF-FIRST-TIME then &optional else)
-(def-special-clause if-first-time (then &optional else)
-  (return-code :body (list
-		      (if-1st-time (list (walk-expr then))
-				   (if else (list (walk-expr else)))))))
+;;; (if (FIRST-TIME-P) ...) returns true for the first time it is evaluated
+(def-special-clause FIRST-TIME-P ()
+  (let ((first-time-var (make-var-and-binding 'first-time t :type 'boolean)))
+    (return-code :body `(if ,first-time-var
+                         (progn
+                           (setf ,first-time-var nil)
+                           t)))))
+
+;;; (if (FIRST-ITERATION-P) ...) returns true in the first iteration of the loop
+(def-special-clause FIRST-ITERATION-P ()
+  (let* ((entry (make-shared-binding 'first-iteration t :type 'boolean))
+         (step-body nil)
+         (first-usage (not (cddr entry)))
+         (var (second entry)))
+    (when first-usage
+      (setf step-body (list `(setf ,var nil)))
+      (setf (cddr entry) (list t)))
+    (return-code :body `(,var)
+                 :step step-body)))
 
 ;;; (IN &body)
 (def-special-clause in (block-name &rest forms)
@@ -3573,6 +3587,12 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Junk.
 
+;;; Obsolete, use (if (first-time-p) ...)
+;;; (IF-FIRST-TIME then &optional else)
+(def-special-clause if-first-time (then &optional else)
+  (warn "if-first-time is obsolete, use (if (first-time-p) ...) instead")
+  (return-code :body (list (if-1st-time (list (walk-expr then))
+                                        (list (walk-expr else))))))
 
 ;;;;;;; For Gnu Emacs ;;;;;;;
 ;;; Local variables:

@@ -12,7 +12,7 @@
 	   #:defsynonym #:dsetq #:declare-variables
 	   #:defmacro-clause #:defmacro-driver #:defclause-sequence
 	   #:initially #:after-each #:finally #:finally-protected
-	   #:else #:if-first-time
+	   #:else #:if-first-time #:first-iteration-p #:first-time-p
 	   #:finish #:leave #:next-iteration #:next #:terminate
 	   #:repeat #:for #:as #:generate #:generating #:in
 	   #:sum #:summing #:multiply #:multiplying
