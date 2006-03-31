@@ -1031,6 +1031,29 @@ function, then it is called on ~expr~ instead of being evaluated.
 
 \end{clauses}
 
+\subsubsection{Boolean Tests}
+
+\begin{clauses}
+
+\clausex{first-iteration-p}{}
+Returns |t| in the first cycle of the loop, otherwise \nil.
+
+\clausex{first-time-p}{}
+Returns |t| the first time the expression is evaluated, and then \nil\ forever.
+This clause comes handy when printing (optional) elements separated
+by a comma:
+
+\begin{program}
+(iter (for el in '(nil 1 2 nil 3))
+      (when el
+        (unless (first-time-p)
+          (princ ", "))
+        (princ el)))
+\end{program}
+produces |"1, 2, 3"|.
+
+\end{clauses}
+
 \subsubsection{Aggregated Boolean Tests}
 
 \begin{clauses}
@@ -2024,19 +2047,19 @@ Siskind helped ferret out many bugs.
 
 %\begin{theindex}
 % The index files must be generated with the genindex program
-% or from makeindex iter-man.idx which creates iter-man.ind.
+% or from makeindex iterate-manual.idx which creates iterate-manual.ind.
 
 %\baselineskip\normalbaselineskip
 %\advance\baselineskip by -2pt
 
-\input{iter-man.ind}
+\input{iterate-manual.ind}
 
 %\underline{Clauses}
-%\input{iter-man.clindex}
+%\input{iterate-manual.clindex}
 %
 %\indexspace
 %\underline{Lisp}
-%\input{iter-man.lispindex}
+%\input{iterate-manual.lispindex}
 
 %\end{theindex}
 

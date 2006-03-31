@@ -1,10 +1,10 @@
-SOURCES=iterate-bare.tex iter-man.tex
-DUMMY_INDEXES=iter-man.ind
+SOURCES=iterate-bare.tex iterate-manual.tex
+DUMMY_INDEXES=iterate-manual.ind
 MKIDX=makeindex
 MKIDXFLAGS=-l
 LATEX=latex
 
-all: iter-bare.ps iter-man.ps iter-bare.pdf iter-man.pdf
+all: iterate-bare.pdf iterate-manual.pdf iterate-bare.ps iterate-manual.ps
 
 %.dvi: %.tex
 	touch $*.ind $*.idx
