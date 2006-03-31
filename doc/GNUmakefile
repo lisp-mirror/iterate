@@ -4,7 +4,7 @@ MKIDX=makeindex
 MKIDXFLAGS=-l
 LATEX=latex
 
-all: iterate-bare.ps iter-man.ps
+all: iter-bare.ps iter-man.ps iter-bare.pdf iter-man.pdf
 
 %.dvi: %.tex
 	touch $*.ind $*.idx
@@ -13,12 +13,15 @@ all: iterate-bare.ps iter-man.ps
 	${LATEX} $<
 
 %.ps: %.dvi
-	dvips -o $@ $<
+	dvips -o $@ $*.dvi
+
+%.pdf: %.dvi
+	dvipdf $*.dvi $@
 
 clean:
 	rm -f *.dvi *.log *.aux *.ind *.idx *.toc *.auxs *.ilg
 
 shiny: clean
-	rm -f *.ps
+	rm -f *.ps *.pdf
 
 # arch-tag: "c8f080e3-313c-11d8-abb9-000c76244c24"
