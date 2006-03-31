@@ -974,6 +974,24 @@
 	    (collect i)))
   (1 -1 3 -1 5))
 
+(deftest first-time-p.1
+    (iter (for i to 5)
+          (if (first-time-p) (collect -1))
+          (if (first-time-p) (collect -2))
+	  (when (oddp i)
+	    (if (first-time-p) nil (collect -1))
+	    (collect i)))
+  (-1 -2 1 -1 3 -1 5))
+
+(deftest first-iteration-p.1
+    (iter (for i to 5)
+          (if (first-iteration-p) (collect -1))
+          (if (first-iteration-p) (collect -2))
+	  (when (oddp i)
+	    (if (first-iteration-p) nil (collect -1))
+	    (collect i)))
+  (-1 -2 -1 1 -1 3 -1 5))
+
 (deftest collect.multiple.1
     (iter (for i from 1 to 10)
 	  (collect i into nums)
