@@ -255,6 +255,12 @@
 
 (defvar *accum-var-alist*)
 
+;;; Shared variables created by make-shared-binding.
+;;; It's an alist of (name gensym-var <possibly other info>).
+;;; Tipical use is FIRST-ITERATION-P.
+
+(defvar *shared-bindings-alist*)
+
 ;;; Name of the block for this iterate form.  Used in generating
 ;;; return statements.
 
@@ -539,6 +545,7 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 	 (*declarations* nil)
 	 (*loop-body-wrappers* nil)
 	 (*accum-var-alist* nil)
+         (*shared-bindings-alist* nil)
 	 (*top-level?* t)
 	 (*binding-context?* nil)
 	 (*temps* nil)
@@ -1753,7 +1760,15 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
       (check-internal-variables var)
       entry))))
 
-
+(defun make-shared-binding (var value &key type using-type-of)
+  "Look up or create an alist entry keyed by var, store a gensym
+   in the value and also add it as a binding. Return the entry."
+  (let ((entry (assoc var *shared-bindings-alist* :test #'eq)))
+    (unless entry
+        (setq entry (list var (gensym (string var))))
+        (push entry *shared-bindings-alist*)
+        (make-binding (second entry) value :type type :using-type-of using-type-of))
+    entry))
 
 (defun make-binding-internal (var-spec value value-supplied? 
 				       use-type using-type-of)
