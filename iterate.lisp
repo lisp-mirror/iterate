@@ -569,14 +569,14 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
       (prepend (default-driver-code) body)
       (let ((it-bod `(block ,*block-name*
 		      (tagbody
-			 ,.init-code
+			 (progn ,.init-code)
 			 ,*loop-top*
-			 ,.body
+			 (progn ,.body)
 			 ,.(if *loop-step-used?* (list *loop-step*))
-			 ,.steppers
+			 (progn ,.steppers)
 			 (go ,*loop-top*)
 			 ,.(if *loop-end-used?* (list *loop-end*))
-			 ,.final-code)
+			 (progn ,.final-code))
 		      ,(if (member *result-var* *bindings* :key #'car)
 			   *result-var*
 			   nil))))
