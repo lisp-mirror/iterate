@@ -1715,4 +1715,45 @@
 		do (loop-finish)))
   nil)
 
+;; Misc tests to make sure that bugs don't reappear
+
+(defmacro problem-because-i-return-nil (&rest args)
+  (declare (ignore args))
+  nil)
+
+(deftest tagbody.nil-tags
+;;  Allegro (correctly) won't compile when a tag (typically NIL) is used more than once in a tagbody.
+    (labels ((find-tagbody (form)
+               (cond
+                 ((and (listp form)
+                       (eq (first form)
+                           'tagbody))
+                  form)
+                 ((listp form)
+                  (iter (for x in (rest form))
+                        (for y = (find-tagbody x))
+                        (when y
+                          (return y))
+                        (until y)))
+                 (t nil)))
+             (all-tagbody-tags (form)
+               (iter (for tag-or-form in (rest (find-tagbody form)))
+                     (when (symbolp tag-or-form)
+                       (collect tag-or-form)))))
+      (let* ((form (macroexpand '
+                    (iter (for x in '(1 2 3))
+                          (problem-because-i-return-nil)
+                          (+ x x)
+                          (problem-because-i-return-nil))))
+             (tags (all-tagbody-tags form))
+             (test-result t))
+        (iter (for tag in tags)
+              (when (not (= 1 (funcall #'count tag tags)))
+                (setf test-result nil)
+                (format t "Tag ~a is used more than once in the tagbody ~a" tag (find-tagbody form))))
+        test-result))
+  t)
+
+
+
 ;;; arch-tag: "b8b1db2d-313c-11d8-abb9-000c76244c24"
