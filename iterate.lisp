@@ -171,7 +171,7 @@
 ;;;    ATOM: Will terminate correctly with no error.
 ;;;    ENDP: Will give an appropriate error message.
 
-(defparameter *list-end-test* 'atom)
+(defparameter *list-end-test* 'endp)
 
 ;;; *result-var* is bound to a gensym before the clauses of an iterate
 ;;; form are processed.  In the generated code, the gensym is bound
