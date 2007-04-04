@@ -307,7 +307,7 @@
     (return-from . 	    walk-cddr)
     (setq . 		    walk-setq)
     (symbol-macrolet . 	    walk-cddr-with-declarations)
-    (tagbody . 		    walk-cdr)
+    (tagbody . 		    walk-tagbody)
     (the . 		    walk-cddr)
     (throw . 		    walk-cdr) 
     (unwind-protect . 	    walk-cdr)
@@ -982,6 +982,21 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
     (return-code-modifying-body #'walk-arglist forms
 				#L(list (cons first (cons second (nconc decls !1)))))))
 
+(defun walk-tagbody (tagbody &rest statements)
+  (flet ((walk-statements (statements)
+	   (walk-list-nconcing
+	    statements
+	    #L(if (atom !1) (list !1) (walk !1))
+	    #'(lambda (form body)
+		(cond ((atom form) body)
+		      ;; wrap statements which expand into an atom
+		      ((typep body '(cons atom null))
+		       (list (cons 'progn body)))
+		      (t body))))))
+    (let ((*top-level?* nil))
+      (return-code-modifying-body
+       #'walk-statements statements
+       #L(list (cons tagbody !1))))))
 
 (defun walk-macrolet (form-name &rest stuff)
   (declare (ignore stuff))
