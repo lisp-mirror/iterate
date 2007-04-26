@@ -461,11 +461,9 @@
 ;;; e.g. #L(list !2 !3 !5) is equivalent to:
 ;;;      (lambda (!1 !2 !3 !4 !5) (declare (ignore !1 !4)) (list !2 !3 !5))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
+(eval-when (:compile-toplevel)
 
-  (defvar *old-sharpL-func* (get-dispatch-macro-character #\# #\L))
-
-  (defun sharpL-reader (stream subchar n-args)
+  (defun sharp-l-reader (stream subchar n-args)
     (declare (ignore subchar))
     (let* ((form (read stream t nil t))
 	   (bang-vars (sort (bang-vars form) #'< :key #'bang-var-num))
@@ -490,8 +488,6 @@
 		       (if decl (list decl form) (list form))))
 	     (subbed-body (sublis (pairlis bvars args) body)))
 	`#'(lambda ,args ,.subbed-body))))
-  
-  (set-dispatch-macro-character #\# #\L #'sharpL-reader)
 
   (defun make-bang-var (n)
     (intern (format nil "!~d" n)))
@@ -520,7 +516,24 @@
 	  (error "#L: ~a is not a valid variable specifier" sym)
 	  num)))
 
-  )					;end eval-when
+  (defun enable-sharp-l-reader ()
+    (set-dispatch-macro-character #\# #\L #'sharp-l-reader))
+
+  ;; According to CLHS, *readtable* must be rebound when compiling
+  ;; so we are free to reassign it to a copy and modify that copy.
+  (setf *readtable* (copy-readtable *readtable*))
+  (enable-sharp-l-reader)
+
+  ) ; end eval-when
+
+#|
+;; Optionally set up Slime so that C-c C-c works with #L
+#+#.(cl:when (cl:find-package "SWANK") '(:and))
+(unless (assoc "ITERATE" swank:*readtable-alist* :test #'string=)
+  (bind ((*readtable* (copy-readtable *readtable*)))
+    (enable-sharp-l-reader)
+    (push (cons "ITERATE" *readtable*) swank:*readtable-alist*)))
+;|#
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; The ITERATE macro.
@@ -3579,10 +3592,6 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
   `(progn (setq *print-pretty* t) (macroexpand-1 ',x)))
 |#
 
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (when (and (boundp '*old-sharpL-func*) *old-sharpL-func*)
-    (set-dispatch-macro-character #\# #\L *old-sharpL-func*)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Junk.
