@@ -1735,16 +1735,13 @@
 ;;  Allegro (correctly) won't compile when a tag (typically NIL) is used more than once in a tagbody.
     (labels ((find-tagbody (form)
                (cond
-                 ((and (listp form)
+                 ((and (consp form)
                        (eq (first form)
                            'tagbody))
                   form)
-                 ((listp form)
+                 ((consp form)
                   (iter (for x in (rest form))
-                        (for y = (find-tagbody x))
-                        (when y
-                          (return y))
-                        (until y)))
+                        (thereis (find-tagbody x))))
                  (t nil)))
              (all-tagbody-tags (form)
                (iter (for tag-or-form in (rest (find-tagbody form)))
@@ -1755,15 +1752,24 @@
                           (problem-because-i-return-nil)
                           (+ x x)
                           (problem-because-i-return-nil))))
-             (tags (all-tagbody-tags form))
-             (test-result t))
-        (iter (for tag in tags)
-              (when (not (= 1 (funcall #'count tag tags)))
-                (setf test-result nil)
-                (format t "Tag ~a is used more than once in the tagbody ~a" tag (find-tagbody form))))
-        test-result))
+             (tags (all-tagbody-tags form)))
+         (iter (for tag in tags)
+              ;; invoke cl:count, not the Iterate clause:
+              (always (= 1 (funcall #'count tag tags :from-end nil))))))
   t)
 
+(deftest walk.tagbody.1
+    (iter (tagbody
+	     (problem-because-i-return-nil)
+	     3
+	     (problem-because-i-return-nil)
+	     (leave 2)))
+  2)
 
+(deftest walk.tagbody.2
+    (symbol-macrolet ((error-out (error "do not expand me")))
+      (iter (tagbody error-out
+	       (leave 2))))
+  2)
 
 ;;; eof

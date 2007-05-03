@@ -31,5 +31,3 @@
         ,(if doc
              `(defconstant ,name ,value ,doc)
            `(defconstant ,name ,value)))))
-
-;;; arch-tag: "b8bb0bb6-313c-11d8-abb9-000c76244c24"
