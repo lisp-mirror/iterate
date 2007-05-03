@@ -429,6 +429,16 @@
 	  (while (< (length (collect i)) 2)))
   (1 2))
 
+(deftest else.1
+    (iter (repeat 0)
+	  (else (return 1)))
+  1)
+
+(deftest else.2
+    (iter (for i below -3)
+	  (else (return 2)))
+  2)
+
 ;;; tests for my examples:
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -671,7 +681,7 @@
 
 (deftest or.2
     (iter (generate x in '(a nil nil 1 nil))
-	  (generate y in-vector '#(2 nil #\c #\d))
+	  (generate y in-sequence '#(2 nil #\c #\d))
 	  (collect (or (next x) (next y) 3)))
   (a 2 3 1 #\c))
 
@@ -1756,4 +1766,4 @@
 
 
 
-;;; arch-tag: "b8b1db2d-313c-11d8-abb9-000c76244c24"
+;;; eof

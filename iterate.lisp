@@ -1544,8 +1544,8 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 			 ,index-doc-string
 			 (cond 
 			  (with-index
-			   (clause-error "WITH-INDEX keyword should not ~
-  be specified for this clause"))
+			   (clause-error
+			    "WITH-INDEX should not be specified for this clause"))
 			  (t
 			   (setq with-index var)
 			   (return-sequence-code
@@ -3609,5 +3609,3 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 ;;; kept-new-versions: 5
 ;;; kept-old-versions: 0
 ;;; end:
-
-;;; arch-tag: "b8b80174-313c-11d8-abb9-000c76244c24"
