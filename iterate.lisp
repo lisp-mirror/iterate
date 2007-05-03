@@ -80,7 +80,6 @@
 ;;;  - reducing and accum: RESULT-TYPE
 ;;;  - rethink types 
 ;;;  - how to type result var?
-;;;  - *list-end-test* should work with functions as well.
 ;;;  - (for var concatenate (from 1 to 10) (in '(a b c)) (next (gensym)))
 ;;;  -       (if (< var 10) 
 ;;;		 (next [from-to])
@@ -162,16 +161,6 @@
 ;;; This is like (declare (declare-variables)).
 
 (defvar *always-declare-variables* nil)
-
-;;; This is so the advanced user can choose how the end of a list is checked
-;;; for. 
-;;; There are three choices for termination predicate in FOR...ON and
-;;; FOR...IN, differing in their behavior on lists with a non-nil cdr:
-;;;    NULL: If lucky, will get an error when taking the cdr.  Bad choice.
-;;;    ATOM: Will terminate correctly with no error.
-;;;    ENDP: Will give an appropriate error message.
-
-(defparameter *list-end-test* 'endp)
 
 ;;; *result-var* is bound to a gensym before the clauses of an iterate
 ;;; form are processed.  In the generated code, the gensym is bound
@@ -2524,12 +2513,10 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 (defclause-driver (for var on list &optional by (step ''cdr))
   "Sublists of a list"
   (top-level-check)
-  (let* ((list-var (make-var-and-default-binding 'list
-		    ;; Handle dotted lists unless *list-end-test* is NULLp
-		    :type (if (eq 'null *list-end-test*) 'list)))
+  (let* ((list-var (make-var-and-default-binding 'list))
+	 ;; Handle dotted lists, so type declaration is not possible
 	 (setqs (do-dsetq var list-var t 'list))
-	 ;; declaring type cons would be incompatible with initial value nil
-	 (test `(if (,*list-end-test* ,list-var) (go ,*loop-end*))))
+	 (test `(if (atom ,list-var) (go ,*loop-end*))))
     (setq *loop-end-used?* t)
     (return-driver-code :initial `((setq ,list-var ,list))
 			:next (list test
@@ -2542,10 +2529,9 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 (defclause-driver (for var in list &optional by (step ''cdr))
   "Elements of a list"
   (top-level-check)
-  (let* ((on-var (make-var-and-default-binding 'list :type 'list
-		    :type (if (eq 'null *list-end-test*) 'list 't)))
+  (let* ((on-var (make-var-and-default-binding 'list :type 'list))
 	 (setqs (do-dsetq var `(car ,on-var)))
-	 (test `(if (,*list-end-test* ,on-var) (go ,*loop-end*))))
+	 (test `(if (endp ,on-var) (go ,*loop-end*))))
     (setq *loop-end-used?* t)
     (return-driver-code :initial `((setq ,on-var ,list))
 			:next (list test
@@ -2724,16 +2710,16 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 ;
 ;(FOR var FROM n TO m) => (initially (setq var (- n 1)) (setq limit (- m 1)))
 ;                         (FOR var NEXT (if (> var limit) (finish) (1+ var))
-;					 
+;
 ;
 ;(FOR var ON list)  =>    (initially (setq temp list))
-;                         (FOR var NEXT (if (null temp) 
+;                         (FOR var NEXT (if (atom temp)
 ;					   (finish)
 ;					   (progn (setq temp (cdr temp))
 ;						  temp)))
 ;
 ;(FOR var IN list) =>    (initially (setq temp list))
-;			(FOR var NEXT (if (null temp)
+;			(FOR var NEXT (if (endp temp)
 ;					  (finish)
 ;					  (pop temp)))
 ;

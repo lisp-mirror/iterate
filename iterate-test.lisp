@@ -1209,6 +1209,28 @@
 	  (finally (return x)))
   -8)
 
+(deftest dotted.1
+    (iter (for l on '(1 2 . 3))
+	  (collect l))
+  ((1 2 . 3) (2 . 3)))
+
+(deftest dotted.2
+    (iter (for (e) on '(1 2 . 3))
+	  (collect e))
+  (1 2))
+
+(deftest dotted.3
+    (values (ignore-errors (iter (for i in '(1 2 . 3)) (count t))))
+  nil)
+
+(deftest dotted.4
+    (iter (for i in '(1 1 2 3 . 3)) (thereis (evenp i)))
+  t)
+
+(deftest dotted.5
+    (iter (for i in '(1 2 . 3)) (thereis (evenp i)))
+  t)
+
 (deftest walk.multiple-value-bind
     (string-upcase
      (iter (for name in-vector (vector 'iterate "FoOBaRzOt" '#:repeat))
