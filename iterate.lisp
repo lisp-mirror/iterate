@@ -450,7 +450,7 @@
 ;;; e.g. #L(list !2 !3 !5) is equivalent to:
 ;;;      (lambda (!1 !2 !3 !4 !5) (declare (ignore !1 !4)) (list !2 !3 !5))
 
-(eval-when (:compile-toplevel)
+(eval-when (:compile-toplevel :execute)
 
   (defun sharp-l-reader (stream subchar n-args)
     (declare (ignore subchar))
