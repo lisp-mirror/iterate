@@ -452,7 +452,7 @@
 
 (eval-when (:compile-toplevel :execute)
 
-  (defun sharp-l-reader (stream subchar n-args)
+  (defun sharpL-reader (stream subchar n-args)
     (declare (ignore subchar))
     (let* ((form (read stream t nil t))
 	   (bang-vars (sort (bang-vars form) #'< :key #'bang-var-num))
@@ -505,13 +505,13 @@
 	  (error "#L: ~a is not a valid variable specifier" sym)
 	  num)))
 
-  (defun enable-sharp-l-reader ()
-    (set-dispatch-macro-character #\# #\L #'sharp-l-reader))
+  (defun enable-sharpL-reader ()
+    (set-dispatch-macro-character #\# #\L #'sharpL-reader))
 
   ;; According to CLHS, *readtable* must be rebound when compiling
   ;; so we are free to reassign it to a copy and modify that copy.
   (setf *readtable* (copy-readtable *readtable*))
-  (enable-sharp-l-reader)
+  (enable-sharpL-reader)
 
   ) ; end eval-when
 
@@ -520,7 +520,7 @@
 #+#.(cl:when (cl:find-package "SWANK") '(:and))
 (unless (assoc "ITERATE" swank:*readtable-alist* :test #'string=)
   (bind ((*readtable* (copy-readtable *readtable*)))
-    (enable-sharp-l-reader)
+    (enable-sharpL-reader)
     (push (cons "ITERATE" *readtable*) swank:*readtable-alist*)))
 ;|#
 
