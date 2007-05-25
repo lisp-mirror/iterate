@@ -1251,7 +1251,7 @@ not part of Jonathan Amsterdam's original design.
 @clauseu{first-iteration-p}
 @deffn Clause first-iteration-p
 
-Returns @code{t} in the first cycle of the loop, otherwise @code{nil}.
+Returns @code{t} in the first iteration of the loop, otherwise @code{nil}.
 @end deffn
 
 @clauseu{first-time-p}
