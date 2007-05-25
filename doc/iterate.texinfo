@@ -338,6 +338,22 @@ symbol, in which case destructuring is performed. See
 
 @var{var} is set to successive elements of list. @var{step-function},
 which defaults to @code{cdr}, is used to obtain the next sublist.
+
+This clause uses @code{endp} to test for the end of a list, hence
+should signal an error when processing an improper list whose final
+@code{cdr} is not @code{nil}---like @code{loop}.  Prior to 2007,
+@iter{} would default to @code{atom} and silently exit.
+
+@vindex *list-end-test*
+@quotation Compatibility Note
+The original implementation used the variable
+@code{iterate::*list-end-test*}, defaulting to @code{atom}.  Years
+later, it was deemed unacceptable for the semantics @emph{not} to be
+lexically apparent from the iteration form so this variable was
+removed.  If your application depends on the original behaviour, the
+ancient @code{for @v{var} in} is equivalent to
+@code{for (@v{var}) on}.
+@end quotation
 @end deffn
 
 @claused{for, on}
@@ -345,16 +361,18 @@ which defaults to @code{cdr}, is used to obtain the next sublist.
 
 @var{var} is set to successive sublists of list. @var{step-function}
 (default @code{cdr}) is used as in @code{for@dots{} in}.
+
+This clause uses @code{atom} to test for the end of a list, so it can
+be used with dotted lists---like @code{loop}.
 @end deffn
 
-@vindex *list-end-test*
-These two clauses use @code{atom} to test for the end of a list.
-Hence, given a list whose final @code{cdr} is not @code{nil}, they
-will silently ignore the last @code{cdr}.  Other choices are
-@code{endp}, which would signal an error, and @code{null}, which would
-probably result in an error somewhere else.  If you wish to use an
-end-test other than @code{atom}, set the variable
-@code{iterate::*list-end-test*} to the name of the desired function.
+@c These two clauses use @code{atom} to test for the end of a list.
+@c Hence, given a list whose final @code{cdr} is not @code{nil}, they
+@c will silently ignore the last @code{cdr}.  Other choices are
+@c @code{endp}, which would signal an error, and @code{null}, which would
+@c probably result in an error somewhere else.  If you wish to use an
+@c end-test other than @code{atom}, set the variable
+@c @code{iterate::*list-end-test*} to the name of the desired function.
 
 @claused{for, in-vector}
 @deffn Clause for @v{var} @cl{in-vector} @v{vector} @k{&sequence}
