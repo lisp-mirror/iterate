@@ -1,7 +1,7 @@
 \input texinfo   @c -*- Mode: Texinfo; Mode: auto-fill -*-
 @c %**start of header
 @setfilename iterate.info
-@settitle The Iterate Manual
+@settitle The Iterate Manual and Paper
 @exampleindent 2
 
 @c @documentencoding utf-8
@@ -20,8 +20,8 @@
 @end macro
 
 @macro impnote {text}
-@quotation
-@strong{Implementor's note:} @emph{\text\}
+@quotation Implementor's note
+@emph{\text\}
 @end quotation
 @end macro
 
@@ -75,8 +75,8 @@ Copyright @copyright{} 1989 Jonathan Amsterdam <jba at ai.mit.edu> @*
 @c  <loliveira at common-lisp.net> @*
 
 @quotation
-The present manual is an adaptation of Jonathan Amsterdam's ``The
-Iterate Manual'', @acronym{MIT} @acronym{AI} Memo No. 1236. Said memo
+The present manual is a conversion of Jonathan Amsterdam's ``The
+Iterate Manual'', @acronym{MIT} @acronym{AI} Memo No.@: 1236.  Said memo
 mentioned the following contract information:
 
 @emph{This report describes research done at the Artificial
@@ -85,12 +85,15 @@ Support for the laboratory's artificial intelligence research is
 provided in part by the Advanced Research Projects Agency of the
 Department of Defense under Office of Naval Research contract
 N00014-85-K-0124.}
+
+The appendix includes Jonathan Amsterdam's Working Paper 324,
+MIT AI Lab entitled ``Don't Loop, Iterate.''
 @end quotation
 @end copying
 @c %**end of header
 
 @titlepage
-@title The Iterate Manual
+@title The Iterate Manual and Paper
 @c @subtitle Version X.X
 @c @author Jonathan Amsterdam
 
@@ -131,10 +134,10 @@ Common Lisp.  @iter{} provides abstractions for many common iteration
 patterns and allows for the definition of additional patterns.
 @iter{} is a macro that expands into ordinary Lisp at compile-time, so
 it is more efficient than higher-order functions like @code{map} and
-@code{reduce}. While it is similar to @code{loop}, @iter{} offers a
+@code{reduce}.  While it is similar to @code{loop}, @iter{} offers a
 more Lisp-like syntax and enhanced extensibility.  (For a more
 complete comparison of @iter{} with other iteration constructs, see
-@acronym{MIT} @acronym{AI} Lab Working Paper No. 324, @emph{Don't
+@acronym{MIT} @acronym{AI} Lab Working Paper No.@: 324, @emph{Don't
 Loop, Iterate.} also included in this manual in @ref{Don't Loop
 Iterate}.)
 
@@ -189,7 +192,7 @@ illustrates some of these features:
 @end lisp
 
 This loop takes the keys of an alist and returns a new alist
-associating the keys with their positions in the original list. The
+associating the keys with their positions in the original list.  The
 compiler declaration for @code{i} will appear in the generated code in
 the appropriate place.
 
@@ -216,6 +219,7 @@ keyword @code{&optional}.
 * Variable Binding and Setting::  
 * Gathering Clauses::           
 * Control Flow::                
+* Predicates::                  
 * Code Placement::              
 @end menu
 
@@ -287,7 +291,7 @@ not an integer, the actual number of executions will be @mathx{\lceil n
 
 The general form for iterating over a sequence of numbers requires a
 variable and, optionally, one or more keywords that provide the bounds
-and step size of the iteration. The @code{&sequence} lambda-list
+and step size of the iteration.  The @code{&sequence} lambda-list
 keyword is a shorthand for these sequence keywords.  They are:
 @code{from}, @code{upfrom}, @code{downfrom}, @code{to}, @code{downto},
 @code{above}, @code{below} and @code{by}.  @code{from} provides the
@@ -295,7 +299,7 @@ starting value for @var{var} and defaults to zero.  @code{to} provides
 a final value and implies that the successive values of @var{var} will
 be increasing; @code{downto} implies that they will be decreasing.
 The loop terminates when @var{var} passes the final value
-(i.e. becomes smaller or larger than it, depending on the direction of
+(i.e.@: becomes smaller or larger than it, depending on the direction of
 iteration); in other words, the loop body will never be executed for
 values of @var{var} past the final value.  @code{below} and
 @code{above} are similar to @code{to} and @code{downto}, except that
@@ -330,7 +334,7 @@ next to the clause.
 
 There are a number of clauses for iterating over sequences.  In all of
 them, the argument following @code{for} may be a list instead of a
-symbol, in which case destructuring is performed. See
+symbol, in which case destructuring is performed.  See
 @ref{Destructuring}.
 
 @claused{for, in}
@@ -359,7 +363,7 @@ ancient @code{for @v{var} in} is equivalent to
 @claused{for, on}
 @deffn Clause for @v{var} @cl{on} @v{list} @k{&optional} @k{by} @v{step-function}
 
-@var{var} is set to successive sublists of list. @var{step-function}
+@var{var} is set to successive sublists of list.  @var{step-function}
 (default @code{cdr}) is used as in @code{for@dots{} in}.
 
 This clause uses @code{atom} to test for the end of a list, so it can
@@ -377,13 +381,13 @@ be used with dotted lists---like @code{loop}.
 @claused{for, in-vector}
 @deffn Clause for @v{var} @cl{in-vector} @v{vector} @k{&sequence}
 
-@var{var} takes on successive elements from @var{vector}. The vector's
+@var{var} takes on successive elements from @var{vector}.  The vector's
 fill-pointer is observed.  Here and in subsequent clauses, the
 @code{&sequence} keywords include @code{with-index}, which takes a
 symbol as argument and uses it for the index variable instead of an
 internally generated symbol.  The other @code{&sequence} keywords
 behave as in numerical iteration, except that the default iteration
-bounds are the bounds of the vector.  E.g. in @code{(for i in-vector v
+bounds are the bounds of the vector.  E.g.@: in @code{(for i in-vector v
 downto 3)}, @code{i} will start off being bound to the last element in
 @code{v}, and will be set to preceding elements down to and including
 the element with index 3.
@@ -457,7 +461,7 @@ more than once.
                   @k{&optional} @k{using} @v{reader}
 
 Opens the file @var{name} (which may be a string or pathname) for
-input, and iterates over its contents. @var{reader} defaults to
+input, and iterates over its contents.  @var{reader} defaults to
 @code{read}, so by default @emph{var} will be bound to the successive
 forms in the file.  The @iter{} body is wrapped in an
 @code{unwind-protect} to ensure that the file is closed no matter how
@@ -506,7 +510,7 @@ from 1 to 10)}:
 @deffn Clause for @v{var} @k{do-next} @v{form}
 
 @var{form} is evaluated each time through the loop.  Its value is
-@var{not} set to @var{var}; that is @var{form}'s job. @var{var} is
+@var{not} set to @var{var}; that is @var{form}'s job.  @var{var} is
 only present so that @iter{} knows it is a driver variable. @*
 @code{(for @var{var} next @var{expr})} is equivalent to @code{(for
 @var{var} do-next (dsetq @var{var} @var{expr}))}.  (See
@@ -652,7 +656,7 @@ then @var{pvar} will be assigned @var{var}'s first value when
 @var{var} is set to its third value.
 
 A @code{for@dots{} previous} clause may occur after or before its
-associated driver clause. @code{for@dots{} previous} works with
+associated driver clause.  @code{for@dots{} previous} works with
 generators as well as ordinary drivers.
 
 Example:
@@ -698,7 +702,7 @@ beginning.
 
 Successive occurrences of @code{with} result in sequential bindings
 (as with @code{let*}).  There is no way to obtain parallel bindings;
-see @ref{Parallel Binding and Stepping} for a rationale. 
+see @ref{Parallel Binding and Stepping} for a rationale.
 @end deffn
 
 @claused{for, =}
@@ -749,7 +753,7 @@ extending @iter{} with new drivers (see @ref{Rolling Your Own}).
 @deffn Clause for @v{var} @cl{first} @v{first-expr} @cl{then} @v{then-expr}
 
 The first time through the loop, @var{var} is set to @var{first-expr};
-on subsequent iterations, it is set to @var{then-expr}. This differs
+on subsequent iterations, it is set to @var{then-expr}.  This differs
 from @code{for@dots{} initially} in that @var{var} is set to
 @var{first-expr} inside the loop body, so @var{first-expr} may depend
 on the results of other clauses.  For instance,
@@ -780,7 +784,7 @@ binding (usually @code{nil}) for the first iteration.
 operations were sufficiently different to warrant different keywords.
 
 Also, the @code{for} in the above three clauses is misleading, since
-none is true driver (e.g. none has a corresponding @code{generate}
+none is true driver (e.g.@: none has a corresponding @code{generate}
 form).  @code{setting} would have been a better choice, but @code{for}
 was used to retain some compatibility with @code{loop}.
 @end quotation
@@ -803,23 +807,22 @@ during the loop, but it should not be modified.
 
 These clauses all begin with a verb.  When the verb does not conflict
 with an existing Common Lisp function, then it may be used in either
-its infinitival or present-participle form (e.g. @code{sum},
+its infinitival or present-participle form (e.g.@: @code{sum},
 @code{summing}).  However, when there is a conflict with Common Lisp,
-only the present-participle form may be used (e.g. @code{unioning}).
+only the present-participle form may be used (e.g.@: @code{unioning}).
 This is to prevent @iter{} clauses from clashing with Common Lisp
 functions.
 
 @c although these clauses are described as ``producing a value,'' it
 @c is a mistake to think of the lisp list representing the clause as a
 @c value-producing form in the usual way.  clauses may legally be
-@c written where a value is expected, e.g. @code{(setq x (sum i))},
+@c written where a value is expected, e.g.@: @code{(setq x (sum i))},
 @c but the lisp value of a clause in such a context is undefined.
 
 @menu
 * Reductions::                  
 * Accumulations::               
 * Finders::                     
-* Boolean Tests::               
 * Aggregated Boolean Tests::    
 @end menu
 
@@ -886,7 +889,7 @@ variable is untyped) or @math{0} (if it has a numeric type).
 @deffn Clause reducing @v{expr} @k{by} @v{func} @k{&optional}
                        @k{initial-value} @v{init-val} @k{into} @v{var}
 
-This is a general way to perform reductions. @var{func} should be a
+This is a general way to perform reductions.  @var{func} should be a
 function of two arguments, the first of which will be the value
 computed so far and the second of which will be the value of
 @var{expr}.  It should return the new value.  @code{reducing} is
@@ -917,7 +920,7 @@ entered, so it should not depend on any value computed inside the
 @c ~expr~ or ~var~ can be determined to be a fixnum or a float,
 @c @iter{} will implement the clause as a true reduction, using one of
 @c the constants |most-negative-fixnum|, |@c most-positive-fixnum|,
-@c |most-negative-short-float|, etc. as appropriate.}
+@c |most-negative-short-float|, etc.@: as appropriate.}
 
 @c ===================================================================
 @node Accumulations
@@ -933,7 +936,7 @@ point in the loop.
                       @k{into} @v{var} @k{at} @v{place} @k{result-type} @v{type}
 
 Produces a sequence of the values of @var{exptr} on each
-iteration. @var{place} indicates where the next value of @var{exptr}
+iteration.  @var{place} indicates where the next value of @var{exptr}
 is added to the list and may be one of the symbols @code{start},
 @code{beginning} (a synonym for @code{start}) or @code{end}.  The
 symbol may be quoted, but need not be.  The default is @code{end}.
@@ -994,7 +997,7 @@ As in Common Lisp, they work only on lists.  Also as in Common Lisp,
 @deffn Clause accumulate @v{expr} @k{by} @v{func} @k{&optional} @
                          @k{initial-value} @v{init-val} @k{into} @v{var}
 
-This is a general-purpose accumulation clause. @var{func} should be a
+This is a general-purpose accumulation clause.  @var{func} should be a
 function of two arguments, the value of @var{expr} and the value
 accumulated so far in the iteration, and it should return the updated
 value.  If no initial value is supplied, @code{nil} is used.
@@ -1033,7 +1036,7 @@ or @var{failure-value} when the epilogue code is run.
 
 As a special case, if the @var{test} expression is a sharp-quoted
 function, then it is applied to @var{expr} instead of being simply
-evaluated.  E.g. @code{(finding x such-that #'evenp)} is equivalent to
+evaluated.  E.g.@: @code{(finding x such-that #'evenp)} is equivalent to
 @code{(finding x such-that (evenp x))}.
 
 @c \cpar although @var{test} need have nothing to do with ~@c expr~ as in
@@ -1046,10 +1049,10 @@ evaluated.  E.g. @code{(finding x such-that #'evenp)} is equivalent to
 @c is slightly different from that for {\lisp 'oddp}; see the discussion
 @c under {\lisp for\dots in} and {\lisp for\dots on}.
 
-@code{On-failure} is a misnomer. Because it is always evaluated, it
+@code{On-failure} is a misnomer.  Because it is always evaluated, it
 behaves more like the default third argument to the @code{gethash}
-function. As a result, @code{on-failure (error "Not found")} makes no
-sense. Instead, the clauses @code{leave} or @code{thereis} can be used
+function.  As a result, @code{on-failure (error "Not found")} makes no
+sense.  Instead, the clauses @code{leave} or @code{thereis} can be used
 in conjunction with @code{finally} as follows:
 
 @lisp
@@ -1059,17 +1062,17 @@ in conjunction with @code{finally} as follows:
 @end lisp
 
 This clause may appear multiple times when all defaults are
-identical. It can also be used together with either
+identical.  It can also be used together with either
 @code{always}/@code{never} or @code{thereis} if their defaults
-match. More specifically, @code{on-failure nil} is compatible with
+match.  More specifically, @code{on-failure nil} is compatible with
 @code{thereis}, while @code{on-failure t} is compatible with
 @code{always} and @code{never} clauses.
 
 @lisp
 (iter (for i in '(7 -4 2 -3))
       (if (plusp i)
-	   (finding i such-that (evenp i))
-          (finding (- i) such-that (oddp i))))
+        (finding i such-that (evenp i))
+        (finding (- i) such-that (oddp i))))
 @end lisp
 @end deffn
 
@@ -1087,8 +1090,8 @@ new extremum is established.  If @var{m-expr} is never evaluated (due
 to, for example, being embedded in a conditional clause), then the
 returned value depends on the type, if any, of @var{expr} (or
 @var{var}, if one is supplied).  If there is no type, the returned
-value will be \nil; if the type is numeric, the returned value will be
-zero.
+value will be @code{nil}; if the type is numeric, the returned value
+will be zero.
 
 For these two clauses, @var{var} may be a list of two symbols; in that
 case, the first is used to record @var{expr} and the second,
@@ -1097,33 +1100,6 @@ case, the first is used to record @var{expr} and the second,
 As with @code{finding@dots{} such-that}, if @var{m-expr} is a
 sharp-quoted function, then it is called on @var{expr} instead of
 being evaluated.
-@end deffn
-
-@c ===================================================================
-@node Boolean Tests
-@subsection Boolean Tests
-
-@clauseu{first-iteration-p}
-@deffn Clause first-iteration-p
-
-Returns @code{t} in the first cycle of the loop, otherwise @code{nil}.
-@end deffn
-
-@clauseu{first-time-p}
-@deffn Clause first-time-p
-
-Returns @code{t} the first time the expression is evaluated, and then
-@code{nil} forever.  This clause comes handy when printing (optional)
-elements separated by a comma:
-
-@lisp
-(iter (for el in '(nil 1 2 nil 3))
-      (when el
-        (unless (first-time-p)
-          (princ ", "))
-        (princ el)))
-@end lisp
-produces @code{"1, 2, 3"}.
 @end deffn
 
 @c ===================================================================
@@ -1147,7 +1123,7 @@ return @code{t}).
 @deffn Clause never @v{expr}
 
 Like @code{(always (not @var{expr}))}, except it does not influence
-the last value returned by a possible other @code{always} clause. That
+the last value returned by a possible other @code{always} clause.  That
 is,
 
 @lisp
@@ -1177,11 +1153,13 @@ implementations of @code{loop}).
 Several clauses can be used to alter the usual flow of control in a
 loop.
 
-Note: the clauses of this and subsequent sections don't adhere to
+@quotation Note
+The clauses of this and subsequent sections don't adhere to
 @iter{}'s usual syntax, but instead use standard Common Lisp syntax.
 Hence the format for describing syntax subsequently is like the
 standard format used in the Common Lisp manual, not like the
 descriptions of clauses above.
+@end quotation
 
 @clauseu{finish}
 @deffn Clause finish
@@ -1202,7 +1180,7 @@ Stops the loop and runs the epilogue code.
 @c @end lisp
 @c 
 @c this code will execute |cleanup| whether or not the test |(correct?
-@c i)| ever succeeds. 
+@c i)| ever succeeds.
 @c the (more elegant) formulation,
 @c @lisp
 @c (iter (initially (make-a-mess))
@@ -1237,7 +1215,7 @@ the epilogue code executed.  Equivalent to @code{(if (not @var{expr})
 @end deffn
 
 @clauseu{until}
-@deffn Clause until @v{~expr~}
+@deffn Clause until @v{expr}
 
 Equivalent to @code{(if @var{expr} (finish))}.
 @end deffn
@@ -1259,6 +1237,38 @@ equivalent to
 
 The only difference is that the @code{for} version makes @var{var}
 available for use with @code{for@dots{} previous}.
+@end deffn
+
+@c ===================================================================
+@node Predicates
+@section Predicates
+
+@quotation Compatibility Note
+The clauses in this section were added in the twenty-first century and
+not part of Jonathan Amsterdam's original design.
+@end quotation
+
+@clauseu{first-iteration-p}
+@deffn Clause first-iteration-p
+
+Returns @code{t} in the first cycle of the loop, otherwise @code{nil}.
+@end deffn
+
+@clauseu{first-time-p}
+@deffn Clause first-time-p
+
+Returns @code{t} the first time the expression is evaluated, and then
+@code{nil} forever.  This clause comes handy when printing (optional)
+elements separated by a comma:
+
+@lisp
+(iter (for el in '(nil 1 2 nil 3))
+      (when el
+        (unless (first-time-p)
+          (princ ", "))
+        (princ el)))
+@print{} 1, 2, 3
+@end lisp
 @end deffn
 
 @c ===================================================================
@@ -1417,14 +1427,14 @@ binding is generated for that piece of the structure).
 
 Sometimes, you might like to do the equivalent of a
 @code{multiple-value-setq} in a clause.  This ``multiple-value
-destructuring'' can be expressed by writing @code{(values @var{pat1}
-@var{pat2} @dots{})} for a destructuring pattern, as in
+destructuring'' can be expressed by writing @code{(values @var{pat_1}
+@var{pat_2} @dots{})} for a destructuring pattern, as in
 
 @lisp
 (for (values (a . b) c d) = (three-valued-function ...))
 @end lisp
 
-Note that the @var{pati} can themselves be destructuring patterns
+Note that the @var{pat_i} can themselves be destructuring patterns
 (though not multiple-value destructuring patterns).  You can't do
 multiple-value destructuring in a @code{with} clause; instead wrap the
 whole @iter{} form in a @code{multiple-value-bind}.
@@ -1442,7 +1452,7 @@ mechanism, using the @code{dsetq} macro:
 @defmac dsetq @v{template} @v{expr}
 
 Performs destructuring of @var{expr} using @var{template}.  May be
-used outside of an @iter{} form. Yields the primary value of
+used outside of an @iter{} form.  Yields the primary value of
 @var{expr}.
 @end defmac
 
@@ -1530,7 +1540,7 @@ code by avoiding error-checks; the resulting problems would be doubly
 hard to track down because the declarations would be hidden from the
 programmer.  Of course, a compiler might omit error-checks even in the
 absence of declarations, though this behavior can usually be avoided,
-e.g. by saying @code{(declaim (optimize (safety 3)))}.
+e.g.@: by saying @code{(declaim (optimize (safety 3)))}.
 
 So, the above @iter{} form will generate code with no declarations.
 But say we wish to declare the types of @code{el} and the internal
@@ -1778,13 +1788,13 @@ mentioned in this list.
 density of parens.
 
 @item
-The current implementation of @iter{}, unlike the current version of
-@code{loop} (as documented in @emph{Common Lisp, 2nd Ed.}), is
-extensible (see @ref{Rolling Your Own}).
+The current implementation of @iter{}, unlike the standardised version
+of @code{loop}, is extensible (see @ref{Rolling Your Own}).
 
 @item
 @code{loop} puts the updates of all driver variables at the top of the
-loop; @iter{} leaves them where the driver clauses appear.
+loop; @iter{} leaves them where the driver clauses appear.  In
+particular, @iter{} allows to place drivers after @code{while} clauses.
 
 @item
 While for the most part @iter{} clauses that resemble @code{loop}
@@ -1898,8 +1908,8 @@ used, and the list may be terminated by @code{&sequence}.  @var{body}
 is an ordinary macro body, as with @code{defmacro}.  If the first form
 of @var{body} is a string, it is considered a documentation string and
 will be shown by
-@code{display-iterate-clauses}. @code{defmacro-clause} will signal an
-error if defining the clause would result in an ambiguity.  E.g. you
+@code{display-iterate-clauses}.  @code{defmacro-clause} will signal an
+error if defining the clause would result in an ambiguity.  E.g.@: you
 cannot define the clause @code{for@dots{} from} because there would be
 no way to distinguish it from a use of the @code{for} clause with
 optional keyword @code{from}.
@@ -2000,7 +2010,7 @@ expression.  Again, this is just good Lisp macrology.  It also has a
 subtle effect on the semantics of the driver: @code{v} is evaluated
 only once, at the beginning of the loop, so changes to @code{v} in the
 loop have no effect on the driver.  Similarly, the bounds for
-numerical iteration e.g. the above @code{array-dimension} are also
+numerical iteration e.g.@: the above @code{array-dimension} are also
 evaluated once only.  This is how all of @iter{}'s drivers work.
 
 There is an important point concerning the @code{progn} in this code.
@@ -2052,7 +2062,7 @@ We can get them easily enough, by writing
 @end lisp
 
 We can now refer to parameters @code{from}, @code{to}, @code{by},
-etc. which contain either the values for the corresponding keyword, or
+etc.@: which contain either the values for the corresponding keyword, or
 @code{nil} if the keyword was not supplied.  Implementing the right
 code for these keywords is cumbersome but not difficult; it is left as
 an exercise.  But before you begin, see @code{defclause-sequence}
@@ -2118,6 +2128,7 @@ documentation strings, for use with @code{display-iterate-clauses}.
 
 The generated element-iterator performs destructuring on the element
 variable.
+@end defmac
 
 As an example, the above @code{for@dots{} in-whole-vector} example
 could have been written:
@@ -2131,7 +2142,6 @@ could have been written:
   :element-doc-string "Elements of a vector, disregarding fill-pointer"
   :index-doc-string  "Indices of vector, disregarding fill-pointer")
 @end lisp
-@end defmac
 
 @c ===================================================================
 @node Subtleties
@@ -2155,16 +2165,16 @@ replacing them.
 @chapter Non-portable Extensions to Iterate (Contribs)
 
 Currently, there is only one non-portable extension to iterate in the
-distribution: iterate-pg. If you have made an extension that depends
-on non-portable features, feel free to send them to
-@code{asf@@boinkor.net} for inclusion in the iterate distribution.
+distribution: @code{iterate-pg}.  If you have made an extension that
+depends on non-portable features, feel free to send them to
+the @iter{} project team for inclusion in the iterate distribution.
 
-@section An SQL query driver for iterate
+@section An SQL Query Driver for Iterate
 
 The pg package by Eric Marsden (see @url{http://cliki.net/pg})
-provides an interface to the PostgreSQL database. Using the
-@code{iterpg} extension, it is possible to handle the results of SQL
-queries using @code{iter}.
+provides an interface to the PostgreSQL database.  Using the
+@code{in-relation} driver, it is possible to handle the results of SQL
+queries with @iter{}.
 
 This usage example should give you an idea of how to use it:
 
@@ -2175,9 +2185,12 @@ This usage example should give you an idea of how to use it:
         (collect version)))
 @end lisp
 
-To use the extension via @acronym{ASDF}, simply make your system
-depend on the @code{iterate-pg} system instead of the @code{iterate} system. To
-load it manually, use:
+The distribution now contains an @file{iterate.asd} system definition
+file for the @iter{} package.
+To use the extension via @acronym{ASDF, Another System Definition
+Facility}, simply make your system depend on the @code{iterate-pg}
+system instead of the @code{iterate} system.  To load it manually,
+use:
 
 @lisp
 (asdf:oos 'asdf:load-op :iterate-pg)
@@ -2187,30 +2200,44 @@ load it manually, use:
 @node Obtaining Iterate
 @chapter Obtaining @code{Iterate}
 
-@impnote{This chapter is very, very obsolete.}
+@iter{} has been successfully ported to most implementations that
+purport to conform to ANSI CL.  Since 2006, source and project
+information is available from
+@url{http://common-lisp.net/project/iterate/}.  The mailing list for
+all purposes is @email{iterate-devel@@common-lisp.net}, but you need
+to subscribe to it before posting.
 
-The information in this chapter is obsolete but included for
-completeness's sake; Currently, the most up-to-date information on
-@iter{} can be found at @url{http://boinkor.net/iterate.html}.
-
-@iter{} currently runs on Lisp Machines, and on HP's, Sun3's and
-Sparcstations under Lucid.  @iter{} source and binaries are available
-at the MIT AI Lab in the subdirectories of @code{/src/local/lisplib/}.
-The source file, @code{iterate.lisp}, is also available for anonymous
-FTP in the directory @code{/com/fpt/pub/} on the machine
-@code{TRIX.AI.MIT.EDU} (Internet number 128.52.32.6).  If you are
-unable to obtain @code{iterate} in one of these ways, send mail to
-@code{jba@@ai.mit.edu} and I will send you the source file.
+The source file was split into two files in 2003: @file{package.lisp}
+contains the package definition, @file{iterate.lisp} the main code.
+Other files in the distribution contain user contributions, test cases
+and documentation.
 
 @iter{} resides in the @code{iterate} package (nickname @code{iter}).
 Just say @code{(use-package :iterate)} to make all the necessary
 symbols available.  If a symbol is not exported, it appears in this
 manual with an ``@code{iterate::}'' prefix.
 
-Send bug reports to @code{bug-iterate@@ai.mit.edu}.  The
+The regression test suite in @file{iterate-test.lisp}, based on
+@acronym{MIT}'s @code{RT} package, contains many examples.
+
+@quotation Note
+The rest of this chapter serves history.
+@end quotation
+
+@iter{} currently runs on Lisp Machines, and on HP's, Sun3's and
+Sparcstations under Lucid.  @iter{} source and binaries are available
+at the @acronym{MIT} @acronym{AI} Lab in the subdirectories of
+@file{/src/local/lisplib/}.
+The source file, @code{iterate.lisp}, is also available for anonymous
+FTP in the directory @file{/com/ftp/pub/} on the machine
+@code{TRIX.AI.MIT.EDU} (Internet number 128.52.32.6).  If you are
+unable to obtain @code{iterate} in one of these ways, send mail to
+@email{jba@@ai.mit.edu} and I will send you the source file.
+
+Send bug reports to @email{bug-iterate@@ai.mit.edu}.  The
 @code{info-iterate} mailing list will have notices of changes and
 problems; to have yourself added, send mail to
-@code{info-iterate-request@@ai.mit.edu}.
+@email{info-iterate-request@@ai.mit.edu}.
 
 @c ===================================================================
 @node Acknowledgements
@@ -2220,13 +2247,18 @@ Richard Waters provided invaluable criticism which spurred me to
 improve @iter{} greatly.  As early users, David Clemens, Oren Etzioni
 and Jeff Siskind helped ferret out many bugs.
 
+Thanks to Andreas Fuch, J@"org H@"ohle and Attila Lendvai, who more
+than a decade after the original release, ported the code to ANSI CL
+and fixed long-standing bugs.
+
 @c ===================================================================
 @node Don't Loop Iterate
 @appendix Don't Loop, Iterate
 
 @quotation Note
-This appendix is a Texinfo conversion of Jonathan Amsterdam's Working
-Paper 324, MIT AI Lab entitled ``Don't Loop, Iterate.''
+This appendix is a Texinfo conversion performed by Lu@'{@dotless{i}}s
+Oliveira of Jonathan Amsterdam's Working Paper 324, MIT AI Lab
+entitled ``Don't Loop, Iterate.''
 @end quotation
 
 @section Introduction
@@ -2262,7 +2294,7 @@ using the higher-order function approach.  And @iter{} is also
 extensible---it's easy to add new clauses to its vocabulary in order
 to express new patterns of iteration in a convenient way.
 
-@c \iter\ is fully documented in AI Lab Memo No. 1236, \iman.
+@c \iter\ is fully documented in AI Lab Memo No.@: 1236, \iman.
 
 @section More about @iter{}
 
@@ -2398,7 +2430,7 @@ embed a loop inside a function.  Tail-recursion also provides no
 abstraction for iteration; in Scheme, that is typically done with
 higher-order functions.
 
-@subsection High-order Dunctions
+@subsection High-order Functions
 
 Lisp's age-old mapping functions, recently revamped for Common Lisp
 [CLM], are another favorite for iteration.  They provide a pleasing
@@ -2483,7 +2515,7 @@ integers.  We saw above that it is easy to iterate over a list and a
 series of numbers simultaneously, but here we would like to do
 something a little different: we want to iterate over the list of
 elements, but only draw a number when we need one (namely, when a list
-element is non-null). The solution employs the @iter{} @code{generate}
+element is non-null).  The solution employs the @iter{} @code{generate}
 keyword in place of @code{for} and the special clause @code{next}:
 
 @lisp
@@ -2536,7 +2568,7 @@ example:
            (collect el)))
 @end lisp
 
-Expressed with \looP, it would read
+Expressed with @code{loop}, it would read
 
 @lisp
 (loop for el in list
@@ -2604,7 +2636,7 @@ do in @code{loop}, but in @iter{} you could simply write a macro:
   `(sum (sqrt ,expr) into ,into-var))
 @end lisp
 
-@code{sum-of-sqrts} is a perfectly ordinary Lisp macro. Since @iter{}
+@code{sum-of-sqrts} is a perfectly ordinary Lisp macro.  Since @iter{}
 expands all macros and processes the results, @code{(sum-of-sqrts el)}
 will behave exactly as if we'd written @code{(sum (sqrt el))}.
 
@@ -2634,7 +2666,7 @@ most, provides nice abstractions, and can be extended.
 If you're new to Lisp iteration, start with @iter{}---look before you
 @code{loop}.  If you're already using @code{loop} and like the power
 that it offers, but have had enough of its syntax and inflexibility,
-then my advice to you is, don't @code{looo}---@iter{}.
+then my advice to you is, don't @code{loop}---@iter{}.
 
 @section Acknowledgments
 
@@ -2648,23 +2680,23 @@ Clemens and Oren Etzioni shared with me the joys of beta-testing.
 
 @itemize
 @item
-[SchemeBook] Abelson, Harold and Gerald Jay Sussman. @emph{Structure
+[SchemeBook] Abelson, Harold and Gerald Jay Sussman.  @emph{Structure
 and Interpretation of Computer Programs.} Cambridge, MA: The MIT
 Press, 1985.
 
 @item
 [Loop] ``The loop Iteration Macro.'' In @emph{Symbolics Common
 Lisp---Language Concepts}, manual 2A of the Symbolics documentation,
-pp. 541--567.
+pp.@: 541--567.
 
 @item
-[CLM] Steele, Guy L.  @emph{Common Lisp: The Language}.  Bedford, MA:
+[CLM] Steele, Guy L@.  @emph{Common Lisp: The Language}.  Bedford, MA:
 Digital Press, 1984.
 
 @item
-[Series] Waters, Richard C.  @emph{Optimization of Series Expressions:
+[Series] Waters, Richard C@.  @emph{Optimization of Series Expressions:
 Part I: User's Manual for the Series Macro Package}.  MIT AI Lab Memo
-No. 1082.
+No.@: 1082.
 @end itemize
 
 @c ===================================================================
