@@ -1950,31 +1950,39 @@ Here is the macro:
 
 @lisp
 (defmacro-clause (FINDING expr MAXIMIZING func &optional INTO var)
-  (let ((max-val (gensym))
-        (temp1 (gensym))
-        (temp2 (gensym))
+  "Simple FINDING... MAXIMIZING implementation"
+  (let ((max-val (gensym "MAX-VAL"))
+        (temp1 (gensym "EL"))
+        (temp2 (gensym "VAL"))
         (winner (or var iterate::*result-var*)))
     `(progn 
        (with ,max-val = nil)
        (with ,winner = nil)
-       (cond 
-        ((null ,max-val)
-         (setq ,winner ,expr)
-         (setq ,max-val (funcall ,func ,winner))
-        (t
-         (let* ((,temp1 ,expr)
-                (,temp2 (funcall ,func ,temp1)))
-           (when (> ,temp2 ,max-val)
-             (setq ,max-val ,temp2)
-             (setq ,winner ,temp1))))))
-       (finally (leave ,winner)))))
+       (let* ((,temp1 ,expr)
+              (,temp2 (funcall ,func ,temp1)))
+         (when (or (null ,max-val) (> ,temp2 ,max-val))
+           (setq ,winner ,temp1 ,max-val ,temp2))))))
 @end lisp
+
+@c This example differs from the built-in finder:
+@c - The built-in one specifies the clause's value (el so far)
+@c   (trivial to implement: add ,winner at end of progn)
+@c - The built-in one accepts an (el max-val) tuple var spec.
+@c - Influence of (the type var) on type declarations
 
 Note that if no @code{into} variable is supplied, we use
 @code{iterate::*result-var*}, which contains the internal variable
 into which all clauses place their results.  If this variable is bound
 by some clause, then @iter{} will return its value automatically;
 otherwise, @code{nil} will be returned.
+
+@c The original example had four flaws:
+@c - ,expr and ,func occured twice in expansion
+@c - (finally (leave ,winner)) breaks because FINALLY does not walk
+@c   its forms, so LEAVE does not work inside FINALLY.
+@c - Do not use (finally (return ,winner)) either, as that would
+@c   always return winner, even in case of ... INTO nil.
+@c - Value of clause as form undefined, unlike all built-in clauses
 
 @menu
 * Writing Drivers::             

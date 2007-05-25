@@ -1,7 +1,7 @@
 ;;; Test cases for Iterate.
 
 ;;; Copyright (c) 2003 Andreas Fuchs <asf@boinkor.net>
-;;; Copyright (c) 2004-2005 Joerg Hoehle <hoehle@users.sourceforge.net>
+;;; Copyright (c) 2004-2007 Joerg Hoehle <hoehle@users.sourceforge.net>
 
 ;;; License:
 ;; Permission is hereby granted, free of charge, to any person
@@ -673,6 +673,11 @@
 	  (if (next x) (collect i)))
   (0 3))
 
+(deftest if.2
+    (iter (generate x in-vector '#(t nil nil t) with-index i)
+	  (if (next x) (collect i)))
+  (0 3))
+
 (deftest or.1
     (iter (generate x in '(a nil nil 1))
 	  (generate y in-vector '#(2 #\c #\d))
@@ -983,6 +988,15 @@
 	    (if-first-time nil (collect -1))
 	    (collect i)))
   (1 -1 3 -1 5))
+
+(deftest first-time-p.0
+    (with-output-to-string (*standard-output*)
+      (iter (for el in '(nil 1 2 nil 3))
+	    (when el
+	      (unless (first-time-p)
+		(princ ", "))
+	      (princ el))))
+  "1, 2, 3")
 
 (deftest first-time-p.1
     (iter (for i to 5)
@@ -1479,7 +1493,7 @@
 	  (sum-of-squares el))
   14)
 
-(deftest defmacro-clause
+(deftest defmacro-clause.1
     (defmacro-clause (multiply.clause expr &optional INTO var)
 	"from testsuite"
       `(reducing ,expr by #'* into ,var initial-value 1))
@@ -1590,6 +1604,45 @@
 	       :with-index i)
 	  (collect (list (next e) e i)))
   ((a a 0) (b b 1) (c c 2)))
+
+;; The original example had three bugs:
+;; - ,expr and ,func occured twice in expansion
+;; - (finally (leave ,winner)) breaks because FINALLY does not walk
+;;   its forms, so LEAVE does not work inside FINALLY.
+;; - Do not use (finally (RETURN ,winner)) either, as that would
+;;   always return accumulated value, even in case of ... INTO nil.
+(deftest defmacro-clause.2
+    (defmacro-clause (FINDING expr MAXING func &optional INTO var)
+      "Iterate paper demo example"
+      (let ((max-val (gensym "MAX-VAL"))
+	    (temp1 (gensym "EL"))
+	    (temp2 (gensym "VAL"))
+	    (winner (or var iterate::*result-var*)))
+	`(progn 
+	  (with ,max-val = nil)
+	  (with ,winner = nil)
+	  (let* ((,temp1 ,expr)
+		 (,temp2 (funcall ,func ,temp1)))
+	    (when (or (null ,max-val) (> ,temp2 ,max-val))
+	      (setq ,winner ,temp1 ,max-val ,temp2)))
+	  #|(finally (return ,winner))|# )))
+  (FINDING expr MAXING func &optional INTO var))
+
+(deftest maxing.1
+    (iter (for i in-vector #(1 5 3))
+	  (finding i :maxing #'identity))
+  5)
+
+(deftest maxing.2
+    (iter (for i in-vector #(1 5 3))
+	  (finding i maxing #'identity into foo))
+  nil)
+
+(deftest maxing.3
+    (iter (for i in-vector #(2 5 4))
+	  (finding i maxing #'identity into foo)
+	  (when (evenp i) (sum i)))
+  6)
 
 (deftest display.1
     (let ((*standard-output* (make-broadcast-stream)))
