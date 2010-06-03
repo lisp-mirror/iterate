@@ -1727,6 +1727,14 @@
 	      (over i)))) ; would yield (1 1 1) if correct
   (1 2 3))
 
+(deftest bug/walk.2
+    (iter (return (if (oddp 1)
+                      (progn)
+                      'even)))
+  ;; The bug is in emtpy PROGN walking. Due to that the THEN branch is lost
+  ;; and it returns 'EVEN instead of NIL.
+  nil)
+
 (deftest bug/macrolet.2
     (progn
       (format *error-output*
