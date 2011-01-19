@@ -439,6 +439,14 @@
 
 ) ;end eval-when
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+
+(defun list-of-forms? (x)
+  (and (consp x) (consp (car x))
+       (not (eq (caar x) 'lambda))))
+
+) ;end eval-when
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; SharpL. 
 ;;;
@@ -480,10 +488,6 @@
 
   (defun make-bang-var (n)
     (intern (format nil "!~d" n)))
-
-  (defun list-of-forms? (x)
-    (and (consp x) (consp (car x))
-	 (not (eq (caar x) 'lambda))))
 
   (defun bang-vars (form)
     (delete-duplicates (bang-vars-1 form '()) :test #'eq))
@@ -1085,7 +1089,6 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 
 (defun symbol-synonym (symbol)
   (or (get symbol 'synonym) symbol))
-
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
 
