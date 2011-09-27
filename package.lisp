@@ -7,7 +7,7 @@
 
 (defpackage #:iterate
   (:use #:cl)
-  (:nicknames #:ITER)
+  (:nicknames #:iter)
   (:export #:iterate #:iter #:display-iterate-clauses
 	   #:defsynonym #:dsetq #:declare-variables
 	   #:defmacro-clause #:defmacro-driver #:defclause-sequence
