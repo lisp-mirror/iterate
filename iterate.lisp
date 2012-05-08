@@ -1319,9 +1319,13 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 	    (kw2 (clause-info-keywords ci2)))
 	(if (= insert-n 2)
 	    (rotatef kw1 kw2))
-	(error "Iterate: Inserting clause ~a would create ~
+	(restart-case
+            (error "Iterate: Inserting clause ~a would create ~
   an ambiguity with clause ~a"
-	       kw1 kw2))))
+                   kw1 kw2)
+          (delete-conflict ()
+            :report "Delete the original clause"
+            (remove-clause kw2))))))
 
 
 (defun ambiguous-clauses? (ci1 ci2)
