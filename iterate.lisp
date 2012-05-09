@@ -3174,7 +3174,10 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 		    expr
 		    (make-application end-operation collect-var expr)))))
       (if (eq place 'start)
-	  (return-code :body `((setq ,collect-var ,op-expr)))
+          (return-code :body `((setq ,collect-var ,op-expr))
+                       :final (unless (eq result-type 'list)
+                                `((setq ,collect-var
+                                        (coerce ,collect-var ',result-type)))))
 	  (with-temporary temp-var
 	    ;; In the update code, must test if collect-var is null to allow
 	    ;; for other clauses to collect into same var.  This code
