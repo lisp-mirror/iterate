@@ -1753,6 +1753,14 @@
 			    (foo))))
   1)
 
+(deftest bug/collect-at-beginning
+    (iterate
+      (for i from 1 to 10)
+      (if (oddp i)
+          (collect i :at :beginning)
+          (collect i)))
+  (9 7 5 3 1 2 4 6 8 10))
+
 ;; Hashtable iterators are specified to be defined as macrolets.
 ;; But we handle these by special-casing with-hash-table/package-iterator
 (deftest nested-hashtable.1
