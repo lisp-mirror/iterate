@@ -2363,7 +2363,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 
 ;;; (IF-FIRST-TIME then &optional else)
 (def-special-clause if-first-time (then &optional else)
-  "Evaluate branch depending on whether this clause if met for the first time"
+  "Evaluate branch depending on whether this clause is met for the first time"
   (return-code :body (list
 		      (if-1st-time (list (walk-expr then))
 				   (if else (list (walk-expr else)))))))
