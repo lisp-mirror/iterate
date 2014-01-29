@@ -885,6 +885,12 @@
 	  (collecting p))
   (9 9 0 1))
 
+(deftest for.previous.var-with-type-declaration
+    (iter (for i from 1 to 5)
+          (for (the fixnum i-prev) previous i)
+	  (collect i-prev))
+  (nil 1 2 3 4))
+
 (deftest for.first.1
     (iter (for num in '(20 19 18 17 16))
 	  (for i first num then (1+ i))
