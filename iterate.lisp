@@ -3352,14 +3352,16 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 ;;; generator, the best we can do is use a flag for the first time.
 
 ;;; (FOR PREVIOUS &optional INITIALLY BACK)
-(defclause (for pvar previous var &optional initially (default nil default?)
-					    back (n-expr 1))
+(defclause (for pvar-spec previous var &optional
+		initially (default nil default?) back (n-expr 1))
   "Previous value of a variable"
   ;; Set each save variable to the default in the initialization.
   (top-level-check)
   (if (not (constantp n-expr))
       (clause-error "~a should be a compile-time constant" n-expr))
-  (let ((n (eval n-expr))) ; Is this okay? It should be.
+
+  (let ((pvar (extract-var pvar-spec))
+	(n    (eval n-expr))) ; Is this okay? It should be.
     (if (not (and (integerp n) (> n 0)))
 	(clause-error "~a should be a positive integer" n-expr)
 	;; Here, n is a positive integer.
@@ -3372,7 +3374,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 	       (save-vars (cons pvar (make-save-vars var (1- n))))
 	       (inits (mapcar #L`(setq ,!1 ,iv-ref) save-vars)))
 	  (if temp (push `(setq ,temp ,init-val) inits))
-	  (make-default-binding pvar)
+	  (make-default-binding pvar-spec)
 	  (push (make-save-info :save-var pvar
 				:iv-ref iv-ref
 				:save-vars save-vars)
