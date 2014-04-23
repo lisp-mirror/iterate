@@ -462,29 +462,38 @@
 
   (defun sharpL-reader (stream subchar n-args)
     (declare (ignore subchar))
+    ;; Depending how an implementation chooses to expand `(,!1 (get-free-temp))
+    ;; at read-time, it might be a macro that must be expanded before groveling
+    ;; the resultant sexpr. Here it gets expanded in the null environment for
+    ;; lack of anything better. If the macro is sensitive to its lexical
+    ;; environment, it suggests perhaps an inappropriate use of #L.
+    ;; However, to support unforseen cases, we will use the original form as
+    ;; read for the resulting lambda's body. Moreover, rather than stuff new
+    ;; atoms into the body which is impossible if the representation is opaque,
+    ;; redirect "!" vars onto gensyms using SYMBOL-MACROLET.
     (let* ((form (read stream t nil t))
-	   (bang-vars (sort (bang-vars form) #'< :key #'bang-var-num))
-	   (bang-var-nums (mapcar #'bang-var-num bang-vars))
-	   (max-bv-num (if bang-vars
-			   (reduce #'max bang-var-nums :initial-value 0)
-			   0)))
-      (cond 
-	((null n-args)
-	 (setq n-args max-bv-num))
-	((< n-args max-bv-num)
-	 (error "#L: digit-string ~d specifies too few arguments" n-args)))
-      (let* ((bvars (let ((temp nil))
-		      (dotimes (i n-args (nreverse temp))
-			(push (make-bang-var (1+ i)) temp))))
-	     (args (mapcar #'(lambda (x) (declare (ignore x)) (gensym))
-			   bvars))
-	     (ignores (set-difference bvars bang-vars))
-	     (decl (if ignores `(declare (ignore .,ignores)) nil))
-	     (body (if (list-of-forms? form)
-		       (if decl (cons decl form) form)
-		       (if decl (list decl form) (list form))))
-	     (subbed-body (sublis (pairlis bvars args) body)))
-	`#'(lambda ,args ,.subbed-body))))
+	   (refd-!vars (sort (bang-vars (macroexpand form))
+                             #'< :key #'bang-var-num))
+	   (bang-var-nums (mapcar #'bang-var-num refd-!vars))
+	   (max-bv-num (if refd-!vars (car (last bang-var-nums)) 0)))
+      (cond ((null n-args)
+             (setq n-args max-bv-num))
+            ((< n-args max-bv-num)
+             (error "#L: digit-string ~d specifies too few arguments" n-args)))
+      (let* ((all-!vars (loop for i from 1 to n-args collect (make-bang-var i)))
+	     (formals (mapcar (lambda (x) (declare (ignore x)) (gensym))
+                              all-!vars)))
+	`#'(lambda ,formals
+             ,@(let ((ignore (mapcan (lambda (!var tempvar)
+                                       (unless (member !var refd-!vars)
+                                         (list tempvar)))
+                                     all-!vars formals)))
+                 (if ignore `((declare (ignore ,@ignore)))))
+             (symbol-macrolet ,(mapcan (lambda (!var tempvar)
+                                         (when (member !var refd-!vars)
+                                           (list (list !var tempvar))))
+                                       all-!vars formals)
+               ,@(if (list-of-forms? form) form (list form)))))))
 
   (defun make-bang-var (n)
     (intern (format nil "!~d" n)))
