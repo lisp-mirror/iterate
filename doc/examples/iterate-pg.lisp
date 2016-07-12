@@ -22,6 +22,12 @@
 ;;; SOFTWARE.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;; An extension to Eric Marsden's pg.lisp:
+;;;  https://gitlab.common-lisp.net/pg/pg
+;;;  https://common-lisp.net/project/pg/
+;;; As of 2016 pg seems to be abandoned and also superseded by Postmodern:
+;;;  http://marijnhaverbeke.nl/postmodern/
+
 ;;; Usage example:
 ;;; (iterate (for (impl version date) in-relation "select * from version" on-connection *dbconn*)
 ;;;          (collect version))

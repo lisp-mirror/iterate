@@ -7,11 +7,6 @@
   :components ((:file "package")
                (:file "iterate" :depends-on ("package"))))
 
-;; TODO probably we should retire this into an examples directory
-(defsystem :iterate/pg
-  :depends-on (:iterate pg)		; Eric Marsden's pg.lisp
-  :components ((:file "iterate-pg")))
-
 (defsystem :iterate/tests
   :depends-on (:iterate #+sbcl :sb-rt #-sbcl :rt)
   :components ((:file "iterate-test")))
