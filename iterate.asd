@@ -3,6 +3,7 @@
 (defsystem :iterate
   :description "Jonathan Amsterdam's iterator/gatherer/accumulator facility"
   :licence "MIT"
+  :in-order-to ((test-op (test-op :iterate/tests)))
   :components ((:file "package")
                (:file "iterate" :depends-on ("package"))))
 
@@ -15,7 +16,6 @@
   :depends-on (:iterate #+sbcl :sb-rt #-sbcl :rt)
   :components ((:file "iterate-test")))
 
-(defmethod asdf:perform ((op asdf:test-op) (c (eql (find-system ':iterate))))
-  (asdf:load-system :iterate/tests)
+(defmethod perform ((operation test-op) (component (eql (find-system :iterate/tests))))
   (funcall (intern "DO-TESTS" (find-package #+sbcl "SB-RT"
                                             #-sbcl "REGRESSION-TEST"))))
