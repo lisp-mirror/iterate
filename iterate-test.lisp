@@ -39,6 +39,17 @@
 
 (rem-all-tests)
 
+;; This is here to document which tests are failing at the time of
+;; writing. It's not used directly here, but the tests of the
+;; iterate-compat package of hu.dwim.reiterate expect it.
+(defvar *tests-expected-to-fail*
+  '(always.finally
+    never.finally
+    thereis.finally
+    bug/walk.2
+    bug/collect-at-beginning
+    ))
+
 (deftest dsetq.1
     (let (x y)
       (dsetq (x y) (list* 4 5 6))
