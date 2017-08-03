@@ -128,6 +128,31 @@
     (iter (for i in '()) (always i))
   t)
 
+(deftest always.finally
+    (with-output-to-string (*standard-output*)
+      (iter (repeat 1)
+            ;; When ALWAYS fails, it RETURN-FROM's from the block and
+            ;; thus skips FINALLY.
+            (always nil)
+            (finally (princ 42))))
+  "42")
+
+(deftest never.finally
+    (with-output-to-string (*standard-output*)
+      (iter (repeat 1)
+            ;; See comment at ALWAYS.4
+            (never t)
+            (finally (princ 42))))
+  "42")
+
+(deftest thereis.finally
+    (with-output-to-string (*standard-output*)
+      (iter (repeat 1)
+            ;; See comment at ALWAYS.4
+            (thereis 43)
+            (finally (princ 42))))
+  "42")
+
 (deftest always.never.1
     (iterate  (repeat 2)
 	      (always 2)
