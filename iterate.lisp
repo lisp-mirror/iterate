@@ -3374,7 +3374,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
     (if (not (and (integerp n) (> n 0)))
 	(clause-error "~a should be a positive integer" n-expr)
 	;; Here, n is a positive integer.
-	(let* ((p-i (intern-previous-info var))
+	(let* ((p-i (intern-previous-info var :next))
 	       (init-val (make-initial-value default default? (var-type var)))
 	       (temp (if (not (duplicable? init-val))
 			 (make-var-and-default-binding
@@ -3398,14 +3398,14 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
       (setf (previous-info-class p-i) class)
       (push (cons code (last code)) (previous-info-code p-i)))))
 
-(defun intern-previous-info (var)
+(defun intern-previous-info (var &optional (default-class :step))
   ;; If VAR already has a previous-info structure, return it; else
   ;; create a new one, put it where it belongs, and return it.
   ;;   Make sure that if VAR is itself a save-var, the new record goes after
   ;; the one for VAR's var, so that the previous code is generated before it
   ;; is itself considered update code for another previous splicing.
   (or (cdr (assoc var *previous-vars-alist*))
-      (let* ((p-i (make-previous-info :var var))
+      (let* ((p-i (make-previous-info :var var :class default-class))
 	     (place (member var *previous-vars-alist* 
 			    :test #'is-save-var)))
 	(if (null place)
