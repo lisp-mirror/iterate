@@ -1777,6 +1777,17 @@
   ;; and it returns 'EVEN instead of NIL.
   nil)
 
+(deftest bug/previously-initially
+    (values
+     (ignore-errors
+       ;; it used to silently return (0 0)
+       ;; now it signals a compile-time error
+       (iter (repeat 2)
+             (for x previous y initially 0)
+             (collect x))
+       'it-should-have-errored))
+  nil)
+
 (deftest bug/macrolet.2
     (progn
       (format *error-output*
