@@ -1777,16 +1777,27 @@
   ;; and it returns 'EVEN instead of NIL.
   nil)
 
-(deftest bug/previously-initially
+(deftest bug/previously-initially.1
     (values
      (ignore-errors
-       ;; it used to silently return (0 0)
-       ;; now it signals a compile-time error
+       ;; It used to silently ignore the entire :previous expression
+       ;; and return (0 0). Now it signals a compile-time error.
        (iter (repeat 2)
-             (for x previous y initially 0)
+             (for x :previous (zork foo) :initially 0)
              (collect x))
        'it-should-have-errored))
   nil)
+
+(deftest bug/previously-initially.2
+    (let ((first-arg 1)
+          (more-args '(2 3 4)))
+      (iter outer
+            (for rest-args :on more-args)
+            (for tmp = (car rest-args))
+            (for first :previous tmp :initially first-arg)
+            (iter (for second :in rest-args)
+                  (in outer (collect (list first second))))))
+  ((1 2) (1 3) (1 4) (2 3) (2 4) (3 4)))
 
 (deftest bug/macrolet.2
     (progn
