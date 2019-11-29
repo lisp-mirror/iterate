@@ -1355,6 +1355,14 @@
           (finally (error "not found")))
   2)
 
+(deftest nil.block.names
+    (iter (for x in '(1 2 3))
+	  (dolist (y '(5 3 4))
+	    (when (= x y)
+	      (leave x)))
+	  (finally (error "not found")))
+  3)
+
 (deftest lambda
     (iter (for i index-of-sequence "ab")
           (collecting ((lambda(n) (cons 1 n)) i)))

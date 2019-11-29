@@ -254,6 +254,7 @@
 ;;; return statements.
 
 (defvar *block-name*)
+(defvar *loop-name*)
 
 ;;; The index of standard clauses (a discrimination tree).  This is a
 ;;; defvar so that reloading doesn't clobber existing defs (though it
@@ -564,12 +565,15 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 	 (*declarations* nil)
 	 (*loop-body-wrappers* nil)
 	 (*accum-var-alist* nil)
-         (*shared-bindings-alist* nil)
+	 (*shared-bindings-alist* nil)
 	 (*top-level?* t)
 	 (*binding-context?* nil)
 	 (*temps* nil)
 	 (*temps-in-use* nil)
 	 (*driver-info-alist* nil)
+	 (*loop-name* (if (symbolp (car body))
+			  (car body)
+			  (gensym "ITERATE")))
 	 (*block-name* (if (symbolp (car body))
 			   (pop body)
 			   nil))
@@ -586,19 +590,22 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 	(augment init-code init)
 	(augment steppers step))
       (prepend (default-driver-code) body)
-      (let ((it-bod `(block ,*block-name*
-		      (tagbody
-			 (progn ,.init-code)
-			 ,*loop-top*
-			 (progn ,.body)
-			 ,.(if *loop-step-used?* (list *loop-step*))
-			 (progn ,.steppers)
-			 (go ,*loop-top*)
-			 ,.(if *loop-end-used?* (list *loop-end*))
-			 (progn ,.final-code))
-		      ,(if (member *result-var* *bindings* :key #'car)
+      (let* ((it-bod `(block ,*loop-name*
+			(tagbody
+			  (progn ,.init-code)
+			  ,*loop-top*
+			  (progn ,.body)
+			  ,.(if *loop-step-used?* (list *loop-step*))
+			  (progn ,.steppers)
+			  (go ,*loop-top*)
+			  ,.(if *loop-end-used?* (list *loop-end*))
+			  (progn ,.final-code))
+			,(if (member *result-var* *bindings* :key #'car)
 			   *result-var*
-			   nil))))
+			   nil)))
+	     (it-bod (if (eql *block-name* nil)
+			 `(block nil ,it-bod)
+			 it-bod)))
 	(wrap-form *loop-body-wrappers*
 		   `(let* ,(nreverse *bindings*)
 		     ,.(if *declarations*
@@ -2986,7 +2993,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 ;;; (LEAVE &optional)
 (defmacro leave (&optional value)
   "Exit the loop without running the epilogue code"
-  `(return-from ,*block-name* ,value))
+  `(return-from ,*loop-name* ,value))
 
 ;;; (WHILE)
 (defclause (while expr)
@@ -3015,7 +3022,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
   (let ((var *result-var*))
     (make-accum-var-binding var t :if-exists)
     (return-code :body `((or (setq ,var ,expr) 
-			     (return-from ,*block-name* nil))))))
+			     (return-from ,*loop-name* nil))))))
 
 ;;; (NEVER)
 (defclause (never expr)
@@ -3025,7 +3032,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
   (let ((var *result-var*))
     ;; Do not use :type 'symbol so as be compatible with ALWAYS
     (make-accum-var-binding var t :if-exists)
-    (return-code :body `((if ,expr (return-from ,*block-name* nil))))))
+    (return-code :body `((if ,expr (return-from ,*loop-name* nil))))))
 
 
 ;;; (THEREIS)
@@ -3036,7 +3043,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
   (let ((var *result-var*))
     (make-accum-var-default-binding var :if-exists)
     (return-code :body `((if (setq ,var ,expr) 
-			     (return-from ,*block-name* ,var))))))
+			     (return-from ,*loop-name* ,var))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Finders.
