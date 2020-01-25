@@ -438,6 +438,15 @@
       (reducing arg by op initial-value start))
   13)
 
+(deftest in-stream.reiter
+    (let ((s (make-string-input-stream "1 2 3 4 5")))
+      (iter (for n below 2)
+            (for line in-stream s))
+      (iter (for n below 2)
+            (for line in-stream s)
+            (collect line)))
+  (3 4))
+
 (deftest reducing.0
     (iter (with expr = '(2 + 10 - 5 + 6))
 	  (with start = (pop expr))
