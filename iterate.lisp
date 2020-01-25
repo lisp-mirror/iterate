@@ -2693,11 +2693,12 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 				      reader stream-var nil `',eof))
 		     ',eof) (go ,*loop-end*))
 	     .,setq)
-     :final-protected `((if (streamp ,stream-var)
-			    (close ,stream-var)))
+     :final-protected (when (eq stream-or-file :file)
+                        `((if (streamp ,stream-var)
+                              (close ,stream-var))))
      :variable var)))
-  
-  
+
+
 ;;; (FOR NEXT)
 (defclause-driver (for var next next)
   "General driver; VAR is set to value of NEXT"
