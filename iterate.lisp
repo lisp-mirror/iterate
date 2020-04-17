@@ -310,6 +310,9 @@
     ;; Prior to 2005, CLISP expanded handler-bind into some
     ;; sys::%handler-bind syntax not declared as a special operator.
     #+clisp (handler-bind . walk-cddr) ; does not recognize clauses in handlers
+    ;; pretty sure the bindings in compiler-let should NOT be transformed,
+    ;; hence use of WALK-CDDR instead of WALK-LET
+    #+ccl (ccl:compiler-let . walk-cddr)
     ;; A suitable generalization would be a pattern language that describes
     ;; which car/cdr are forms to be walked, declarations or structure.
     ;; Walk with-*-iterator ourselves in order to avoid macrolet warnings.
