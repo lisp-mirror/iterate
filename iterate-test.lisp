@@ -1393,6 +1393,22 @@
           (minimize (the double-float '1.0d0)))
   0.0d0)
 
+;;; this test catches problems with make-initial-value, which cannot find a good initial
+;;; value for cases where the initial value should be NIL.  This causes generation of a
+;;; spurious warning.
+(deftest type.8
+    (catch 'warned
+      (handler-bind ((simple-warning #'(lambda (w) (throw 'warned (format nil "~a" w))))
+                     (error #'(lambda (w) (throw 'warned (format nil "~a" w)))))
+        (let ((vec (vector (make-instance 'polar :mag 2) (make-instance 'polar :mag 4))))
+          (nth-value 1
+                     (iter (for x in-vector vec with-index i)
+                       (declare (type (or null polar) x) (type fixnum i))
+                       (with-slots (rho) x
+                         (finding x such-that (= rho 4) into target))
+                       (finally (return (values target i))))))))
+  1)
+
 (deftest static.error.1
     (values
      (ignore-errors ; Iterate complains multiple values make no sense here
