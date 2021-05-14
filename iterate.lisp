@@ -1873,6 +1873,9 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
     (coerce nil type))
    ((subtypep type 'character)
     (coerce (code-char 0) type)) ; Neither #\Null nor #\Nul are valid characters.
+   ;; is NIL an acceptable initial value?  If so, use it.
+   ((subtypep 'null type)
+    (coerce nil type))
    (t 
     (clause-warning 
      "Cannot supply an initial value for type ~s; using NIL."
