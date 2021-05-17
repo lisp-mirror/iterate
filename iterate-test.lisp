@@ -1952,9 +1952,9 @@
 (deftest allegro-compiler-let
     (catch 'compiler-warned
       (handler-bind
-          ((ccl:compiler-warning #'(lambda (e)
-                                 (declare (ignore e))
-                                 (throw 'compiler-warned nil))))
+          ((warning #'(lambda (e)
+                        (declare (ignore e))
+                        (throw 'compiler-warned nil))))
         (let ((def (compile nil '(lambda (list-xs)
                                   (iter (for x in list-xs) (assert x () "~s is not a foo." x))))))
           (when def t))))
