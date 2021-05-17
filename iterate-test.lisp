@@ -31,6 +31,9 @@
 ;; feature of Iterate.
 
 (cl:defpackage #:iterate.test
+  (:import-from #+sbcl #:sb-rt
+                #-sbcl #:regression-test
+                #:*expected-failures*)
   (:use #:cl #:iterate
         #+sbcl #:sb-rt
         #-sbcl #:regression-test))
@@ -48,6 +51,13 @@
     thereis.finally
     bug/walk.2
     bug/collect-at-beginning
+    #+(or clozure ecl)
+    bug/previously-initially.1
+    #+ (or abcl clozure ecl sbcl)
+    IN-STREAM.2
+    #+ecl code-movement.else
+    #+ecl code-movement.finally
+    #+ecl code-movement.finally-protected
     ))
 
 (deftest dsetq.1
@@ -1976,5 +1986,38 @@
           (when def t))))
   t)
 
+
+(define-condition unexpected-failures-error (error)
+  ((failures :initarg :failures))
+  (:report (lambda (ufe str)
+               (format str "Unexpected failures:~%~{~a~%~}" (slot-value ufe 'failures)))))
+
+(define-condition unexpected-successes-error (error)
+  ((successes :initarg :successes))
+  (:report (lambda (ufe str)
+               (format str "Unexpected successes:~%~{~a~%~}" (slot-value ufe 'successes)))))
+
+(defun do-iterate-tests (&key (on-failure :error))
+  (multiple-value-bind (unexpected-failures unexpected-successes)
+      (let ((*expected-failures* *tests-expected-to-fail*))
+        (do-tests)
+        (values
+         (set-difference (pending-tests) *tests-expected-to-fail*)
+         (set-difference *tests-expected-to-fail* (pending-tests))))
+    (format t "~&DO-TESTS returned ~S unexpected failures and ~S unexpected successes~%"
+            unexpected-failures unexpected-successes)
+    (cond
+      ((and unexpected-failures
+            (eq on-failure :error))
+       (error 'unexpected-failures-error :failures unexpected-failures))
+      (unexpected-failures
+       on-failure)
+      ;; no unexpected failures
+      ((and unexpected-successes
+           (eq on-failure :error))
+       (error 'unexpected-successes-error :successes unexpected-successes))
+      (unexpected-successes
+       on-failure)
+      (t t))))
 
 ;;; eof

@@ -13,5 +13,4 @@
   :components ((:file "iterate-test")))
 
 (defmethod perform ((operation test-op) (component (eql (find-system :iterate/tests))))
-  (funcall (intern "DO-TESTS" (find-package #+sbcl "SB-RT"
-                                            #-sbcl "REGRESSION-TEST"))))
+  (uiop:symbol-call '#:iterate.test '#:do-iterate-tests :on-failure :error))
