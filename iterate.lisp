@@ -1047,9 +1047,36 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 (defvar *final*)
 (defvar *finalp*)
 
+(defparameter *deprecated-clause-names* '((count . counting)))
+
+(define-condition deprecation-warning (warning)
+  ((keyword :initarg :keyword)
+   (substitute :initarg :substitute :initform nil)
+   (clause :initarg :clause))
+  (:report (lambda (dw stream)
+             (with-slots (keyword substitute clause) dw
+               (format stream
+                       "~s appears to be used as an ITERATE clause keyword, in this sexpression: ~S. ~
+This use is now deprecated and will cease to be ~
+supported in a future version. ~@[Please use the alternative keyword ~s instead.~] If you intended ~2:*~s to ~
+be interpreted as a function call, instead of an ITERATE clause, you must find an alternative way of calling it, ~
+at present, perhaps by using FUNCALL or APPLY."
+                       keyword clause substitute keyword)))))
+
+(defun check-clause-name (clause)
+  (let* ((sym (first clause))
+         (entry (find sym *deprecated-clause-names* :key 'car)))
+    (when entry
+      (warn 'deprecation-warning :keyword sym :substitute (cdr entry)
+            :clause clause)
+      ;; warn only once per session
+      (setf *deprecated-clause-names*
+            (delete entry *deprecated-clause-names*)))))
+
 (defun process-clause (clause)
+  (check-clause-name clause)
   ;; This should observe the invariant that the forms it returns are
-  ;; already copied from the original code, hence nconc-able.  
+  ;; already copied from the original code, hence nconc-able.
   (let ((*clause* clause)
 	(special-func (assoc (car clause) *special-clause-alist*)))
     (if special-func
