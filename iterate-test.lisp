@@ -33,7 +33,11 @@
 (cl:defpackage #:iterate.test
   (:import-from #+sbcl #:sb-rt
                 #-sbcl #:regression-test
-                #:*expected-failures*)
+                #:*expected-failures*
+                #-sbcl #:*expanded-eval*
+                #:*compile-tests*)
+  (:import-from #:iterate
+                #:deprecation-warning)
   (:use #:cl #:iterate
         #+sbcl #:sb-rt
         #-sbcl #:regression-test))
@@ -2035,13 +2039,17 @@
 
 (defun do-iterate-tests (&key (on-failure :error))
   (multiple-value-bind (unexpected-failures unexpected-successes)
-      (let ((*expected-failures* *tests-expected-to-fail*))
+      (let ((*expected-failures* *tests-expected-to-fail*)
+            #-sbcl(*expanded-eval* t)
+            (*compile-tests* nil))
         (do-tests)
         (values
          (set-difference (pending-tests) *tests-expected-to-fail*)
          (set-difference *tests-expected-to-fail* (pending-tests))))
-    (format t "~&DO-TESTS returned ~S unexpected failures and ~S unexpected successes~%"
-            unexpected-failures unexpected-successes)
+    (if (or unexpected-failures unexpected-successes)
+     (format t "~&DO-ITERATE-TESTS returned~@[ ~S unexpected failure(s)~]~:[~; and~]~@[ ~S unexpected success(es)~].~%"
+             unexpected-failures (and unexpected-failures unexpected-successes) unexpected-successes)
+     (format t "~&DO-ITERATE-TESTS ran successfully.~%"))
     (cond
       ((and unexpected-failures
             (eq on-failure :error))
