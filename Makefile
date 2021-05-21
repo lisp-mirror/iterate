@@ -22,7 +22,7 @@ else ifeq ($(l), allegro)
 
 else ifeq ($(l), ccl)
 	loadfile = --no-init --quiet --load
-        command ?= ccl
+	command ?= ccl
 
 else ifeq ($(l), clasp)
 	command ?= 
@@ -51,7 +51,7 @@ else
 	$(error Don\'t know how to operate on implementation $(l))
 endif
 
-.PHONY: test
+.PHONY: test clear-cache
 
 distrib:
 	tar czf iterate.tgz $(FILES) $(TEXFILES) $(PDFFILES)
@@ -59,13 +59,16 @@ distrib:
 devel:
 	tar czf iterate-rcs.tgz $(FILES) $(RCSFILES) $(TEXFILES) Makefile
 
-test:
+clear-cache:
+	rm -rf test/cache
+
+test:	clear-cache
 	$(command) $(loadfile) test.lisp
 
 
 # Useful for reproducing test failures with Docker.
-test-docker-repl:
+test-docker-repl:	clear-cache
 	@${DOCKER} run --rm -i -t --pull always -u $(shell id -u):$(shell id -g) -v $(sourceDirectory):$(sourceDirectory) -w $(sourceDirectory)/test clfoundation/${l}:latest
 
-test-docker-lisp:
+test-docker-lisp:	clear-cache
 	@${DOCKER} run --rm -i -t --pull always -u $(shell id -u):$(shell id -g) -v $(sourceDirectory):$(sourceDirectory) -w $(sourceDirectory) clfoundation/${l}:latest make test l=${l} t=${t}
