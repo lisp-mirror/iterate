@@ -57,11 +57,10 @@
     bug/collect-at-beginning
     #+(or clozure ecl)
     bug/previously-initially.1
-    #+ (or abcl clozure ecl sbcl)
     IN-STREAM.2
-    #+ecl code-movement.else
-    #+ecl code-movement.finally
-    #+ecl code-movement.finally-protected
+    #+(or allegro ecl) code-movement.else
+    #+(or allegro ecl) code-movement.finally
+    #+(or allegro ecl) code-movement.finally-protected
     ))
 
 (deftest dsetq.1
