@@ -3,7 +3,7 @@
 (defsystem :iterate
   :description "Jonathan Amsterdam's iterator/gatherer/accumulator facility"
   :licence "MIT"
-  :version "1.5.2"
+  :version "1.5.3"
   :in-order-to ((test-op (test-op :iterate/tests)))
   :components ((:file "package")
                (:file "iterate" :depends-on ("package"))))
