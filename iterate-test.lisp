@@ -113,8 +113,36 @@
                         (values 1 'a '(b c))) (list x y z))
   (a b c))
 
+;;; test that use of the deprecated "COUNT" synonym for "COUNTING"
+;;; properly raises a warning, but WON'T raise it twice.
+(deftest count-deprecation.1
+    (let ((retval (list nil)))
+      (declare (special retval))
+      (handler-bind ((deprecation-warning
+                       #'(lambda (w)
+                           (declare (special retval))
+                           (setf (car retval) t)
+                           (muffle-warning w))))
+        (macroexpand '(iter (repeat 9) (count 1))))
+      (list retval iterate::*deprecated-clause-names*))
+  ((t) nil))
+
+;;; the deprecation warning should only appear once -- this
+;;; test checks that.
+(deftest count-deprecation.2
+    (let ((retval (list nil)))
+      (declare (special retval))
+      (handler-bind ((deprecation-warning
+                       #'(lambda (w)
+                           (declare (special retval))
+                           (setf (car retval) t)
+                           (muffle-warning w))))
+        (macroexpand '(iter (repeat 9) (count 1))))
+      (list retval iterate::*deprecated-clause-names*))
+  ((nil) nil))
+
 (deftest repeat.1
-    (iter (repeat 9) (count 1))
+  (iter (repeat 9) (counting 1))
   9)
 
 (deftest repeat.2
