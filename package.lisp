@@ -5,6 +5,10 @@
 ;;; 1. there's no iterate symbol in package USER.
 ;;; 2. it may work in case-sensitive mode/packages.
 
+(defpackage #:iterate-conditions
+  (:nicknames #:iterate-warnings)
+  (:export #:deprecation-warning))
+
 (defpackage #:iterate
   (:use #:cl)
   (:nicknames #:iter)
@@ -19,7 +23,8 @@
 	   #:maximize #:minimize #:maximizing #:minimizing #:counting
 	   #:always #:never #:thereis #:finding #:collect #:collecting
 	   #:with #:while #:until #:adjoining #:nconcing #:appending
-	   #:nunioning #:unioning #:reducing #:accumulate #:accumulating))
+	   #:nunioning #:unioning #:reducing #:accumulate #:accumulating)
+  (:use #:iterate-warnings))
 
 (in-package #:iterate)
 
