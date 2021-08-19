@@ -1458,6 +1458,27 @@
                        (finally (return (values target i))))))))
   1)
 
+;;; test that counting result-type uses an initform of the appropriate type.
+(deftest type.9
+    (iter (declare (iterate:declare-variables))
+          (repeat 0)
+          (counting t result-type double-float))
+  0d0)
+
+;;; test that sum result-type uses an accumulator of the appropriate type.
+(deftest type.10
+    (iter (declare (iterate:declare-variables))
+          (repeat 2)
+          (sum most-positive-fixnum result-type integer))
+  #.(* 2 most-positive-fixnum))
+
+;;; test that multiply result-type uses an accumulator of the appropriate type.
+(deftest type.11
+    (iter (declare (iterate:declare-variables))
+          (for n in (list most-positive-fixnum 2))
+          (multiply n result-type integer))
+  #.(* 2 most-positive-fixnum))
+
 (deftest static.error.1
     (values
      (ignore-errors ; Iterate complains multiple values make no sense here

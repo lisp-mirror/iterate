@@ -844,12 +844,21 @@ list)} or with @iter{} as
 
 @clauseu{sum}
 @deffn Clause sum @v{expr} @k{&optional} @k{into} @v{var}
+                                         @k{result-type} @v{type}
 
 Each time through the loop, @var{expr} is evaluated and added to a
 variable, which is bound initially to zero.  If @var{expr} has a type,
-it is @emph{not} used as the type of the sum variable, which is always
-@code{number}.  To get the result variable to be of a more specific
-type, use an explicit variable, as in
+it is @emph{not} used as the type of the sum variable.  Unless
+@var{type} is supplied or @var{var} has a declared type, @var{var} will
+always have type @code{number}. To get the result variable to be of a
+more specific type, either supply @var{type}, as in:
+
+@lisp
+(iter (for el in number-list)
+      (sum el result-type fixnum))
+@end lisp
+
+or use an explicit variable, as in:
 
 @lisp
 (iter (for el in number-list)
@@ -861,6 +870,7 @@ type, use an explicit variable, as in
 
 @clauseu{multiply}
 @deffn Clause multiply @v{expr} @k{&optional} @k{into} @v{var}
+                                              @k{result-type} @v{type}
 
 Like @code{sum}, but the initial value of the result variable is
 @math{1}, and the variable is updated by multiplying @var{expr} into
@@ -869,6 +879,7 @@ it.
 
 @clauseu{counting}
 @deffn Clause counting @v{expr} @k{&optional} @k{into} @v{var}
+                                              @k{result-type} @v{type}
 
 @var{expr} is evaluated on each iteration.  If it is non-@code{nil},
 the accumulation variable, initially zero, is incremented.
@@ -1613,8 +1624,20 @@ current example, the variable @code{list17} will be given the type
 @code{list}, since that is the only type that makes sense; and the
 variable @code{result} will be given the type @code{fixnum}, on the
 assumption that you will not be counting high enough to need bignums.
-You can override this assumption only by using and explicitly declaring a
-variable: 
+You can override this assumption on @code{count}, @code{sum} and
+@code{multiply} clauses (and their synonyms, @code{counting},
+@code{summing} and @code{multiplying}) using the optional
+@code{result-type} argument:
+
+@lisp
+(iter (declare (iterate:declare-variables))
+      (for el in number-list)
+      (count (oddp el) result-type integer))
+@end lisp
+
+Alterately, you can override it on any form which takes an optional
+@code{into var} argument by declaring the type of @code{var} and
+explicitly returning it:
 
 @lisp
 (iter (declare (iterate:declare-variables))
