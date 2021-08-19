@@ -1479,6 +1479,22 @@
           (multiply n result-type integer))
   #.(* 2 most-positive-fixnum))
 
+;;; test that reducing result-type with an initform doesn't error
+(deftest type.12
+    (iter (declare (iterate:declare-variables))
+          (for i from 1 to 4)
+          (reducing i by #'+ result-type fixnum))
+  10)
+
+;;; test that reducing result-type uses an initform of the appropriate type.
+;; the manual says that this behavior is undefined, but it does work, and it's necessary
+;; for sbcl to generate efficient numeric reductions without throwing a fit.
+(deftest type.13
+    (iter (declare (iterate:declare-variables))
+          (repeat 0)
+          (reducing 0d0 by #'+ result-type double-float))
+  0d0)
+
 (deftest static.error.1
     (values
      (ignore-errors ; Iterate complains multiple values make no sense here

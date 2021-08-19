@@ -2914,9 +2914,10 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 (defsynonym multiplying multiply)
 
 
-;;; (REDUCING BY &optional INITIAL-VALUE INTO)
+;;; (REDUCING BY &optional INITIAL-VALUE INTO RESULT-TYPE)
 (defclause (reducing expr by op &optional initial-value (init-val nil iv?)
-                                          into var-spec)
+                                          into var-spec
+                                          result-type (type (expr-type-only op)))
   "Generalized reduction"
   ;; VALUE: the value accumulated so far.
   ;; If we don't know the initial value, we can't use RETURN-REDUCTION-CODE.
@@ -2932,14 +2933,14 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 			   :expression expr
 			   :test nil
 			   :variable var-spec
-			   :type (expr-type-only op)
+			   :type type
 			   :accum-kind nil))  ; matches anything
    (t
     (setq expr (walk-expr expr))
     (setq var-spec (or var-spec *result-var*))
     (let* ((var (extract-var var-spec))
 	   (entry (make-accum-var-default-binding var-spec nil
-						  :using-type-of expr))
+                                                  :type type))
 	   (prev-first-time-var (third entry)))
       (multiple-value-bind (update-code first-time-var)
 	  (if-1st-time 

@@ -899,6 +899,7 @@ variable is untyped) or @math{0} (if it has a numeric type).
 @clauseu{reducing}
 @deffn Clause reducing @v{expr} @k{by} @v{func} @k{&optional}
                        @k{initial-value} @v{init-val} @k{into} @v{var}
+                       @k{result-type} @v{type}
 
 This is a general way to perform reductions.  @var{func} should be a
 function of two arguments, the first of which will be the value
