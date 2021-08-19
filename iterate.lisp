@@ -2876,39 +2876,39 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 
 (defsynonym count counting)
 
-;;; (COUNTING &optional INTO)
-(defclause (counting expr &optional into var)
+;;; (COUNTING &optional INTO RESULT-TYPE)
+(defclause (counting expr &optional into var result-type (type 'fixnum))
   "Increment a variable if expression is non-nil"
   (return-reduction-code :identity 0
 			 :operation '(subst (var expr) (1+ var))
 			 :expression nil
 			 :test expr
 			 :variable var
-			 :type 'fixnum
+			 :type type
 			 :accum-kind :increment))
 
-;;; (SUM &optional INTO)
-(defclause (sum expr &optional into var)
+;;; (SUM &optional INTO RESULT-TYPE)
+(defclause (sum expr &optional into var result-type (type 'number))
   "Sum into a variable"
   (return-reduction-code :identity 0
 			 :operation '+
 			 :expression expr
 			 :test nil
 			 :variable var
-			 :type 'number
+			 :type type
 			 :accum-kind :increment))
 
 (defsynonym summing sum)
 
-;;; (MULTIPLY &optional INTO)
-(defclause (multiply expr &optional into var)
+;;; (MULTIPLY &optional INTO RESULT-TYPE)
+(defclause (multiply expr &optional into var result-type (type 'number))
   "Multiply into a variable"
   (return-reduction-code :identity 1
 			 :operation '*
 			 :expression expr
 			 :test nil
 			 :variable var
-			 :type 'number
+			 :type type
 			 :accum-kind :increment))
 
 (defsynonym multiplying multiply)
@@ -2916,7 +2916,7 @@ e.g. (DSETQ (VALUES (a . b) nil c) form)"
 
 ;;; (REDUCING BY &optional INITIAL-VALUE INTO)
 (defclause (reducing expr by op &optional initial-value (init-val nil iv?)
-		                          into var-spec)
+                                          into var-spec)
   "Generalized reduction"
   ;; VALUE: the value accumulated so far.
   ;; If we don't know the initial value, we can't use RETURN-REDUCTION-CODE.
