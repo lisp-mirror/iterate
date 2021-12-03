@@ -33,9 +33,28 @@
      (uiop:quit 1))
     (format t "~&Found iterate ASDF system definition.~%"))
 
+(defvar *build-error* nil)
+(defvar *build-warning* nil)
 
+(catch 'build-failed
+ (handler-bind ((warning #'(lambda (x)
+                             ;; this is necessary because on SBCL
+                             ;; there's an EXTERNAL handler for some
+                             ;; uninteresting warnings.
+                             (signal x)
+                             (push x *build-warning*)))
+                (error #'(lambda (x)
+                           (setf *build-error* x)
+                           (throw 'build-failed t))))
+   (asdf:load-system "iterate")))
 
-(asdf:load-system "iterate/tests")
+(cond
+  (*build-error*
+   (uiop:die 1 "ITERATE build failed with an error: ~a.~%" *build-error*))
+  (*build-warning*
+   (uiop:die 2 "ITERATE build failed with warnings:~%~{~t~a~%~}" *build-warning*))
+  (t
+   (format t "ITERATE build successful.~%")))
 
 (handler-bind ((iterate.test::unexpected-failures-error
                  #'(lambda (e)
