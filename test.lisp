@@ -56,6 +56,22 @@
   (t
    (format t "ITERATE build successful.~%")))
 
+;;; pre-loading the iterate tests system is only necessary on ECL, and I have no idea
+;;; why that is. [2021/12/03:rpg]
+#+ecl
+(progn
+ (catch 'build-failed
+   (handler-bind ((error #'(lambda (x)
+                             (setf *build-error* x)
+                             (throw 'build-failed t))))
+     (asdf:load-system "iterate/tests")))
+ (cond
+  (*build-error*
+   (uiop:die 1 "ITERATE/TESTS load failed with an error: ~a.~%" *build-error*))
+  (t
+   (format t "ITERATE/TESTS load successful.~%"))))
+
+
 (handler-bind ((iterate.test::unexpected-failures-error
                  #'(lambda (e)
                      (declare (ignorable e))
