@@ -1058,7 +1058,7 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
                (format stream
                        "~s appears to be used as an ITERATE clause keyword, in this sexpression: ~S. ~
 This use is now deprecated and will cease to be ~
-supported in a future version. ~@[Please use the alternative keyword ~s instead.~] If you intended ~2:*~s to ~
+supported in a future version. ~@[Please use the alternative keyword ~s instead.~] If you intended ~s to ~
 be interpreted as a function call, instead of an ITERATE clause, you must find an alternative way of calling it, ~
 at present, perhaps by using FUNCALL or APPLY."
                        keyword clause substitute keyword)))))
