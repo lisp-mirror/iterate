@@ -33,7 +33,7 @@ else ifeq ($(l), clisp)
 
 else ifeq ($(l), cmucl)
 	command ?= cmucl
-	loadfile = -noinit -batch --load
+	loadfile = -noinit -batch -load
 
 else ifeq ($(l), ecl)
 	command ?= ecl

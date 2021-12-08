@@ -11,10 +11,13 @@
    :ignore-inherited-configuration
    ))
 
-(asdf:load-asd (merge-pathnames (make-pathname
-                                 :name "iterate"
-                                 :type "asd")
-                                *load-truename*))
+(handler-bind ((error #'(lambda (c)
+                          (format t "~&Received error attempting to load ITERATE ASDF system definition:~%~a~%" c)
+                          (uiop:die 4))))
+  (asdf:load-asd (merge-pathnames (make-pathname
+                                   :name "iterate"
+                                   :type "asd")
+                                  *load-truename*)))
 
 (format t "~&Successfully loaded the iterate ASD file.~%")
 
