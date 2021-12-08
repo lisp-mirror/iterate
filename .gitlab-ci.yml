@@ -82,6 +82,7 @@ CMUCL regression tests:
   image: $CMUCL_IMAGE:$CMUCL_TAG
   variables:
     l: cmucl
+  allow_failure: true
 
 ECL regression tests:
   extends: .Regression tests
