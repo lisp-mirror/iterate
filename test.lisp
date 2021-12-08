@@ -72,12 +72,10 @@
    (format t "ITERATE/TESTS load successful.~%"))))
 
 
-(handler-bind ((iterate.test::unexpected-failures-error
-                 #'(lambda (e)
-                     (declare (ignorable e))
-                     (format t "~&Catching unexpected failures error.~%")
-                     (uiop:quit 2)))
-               (error #'(lambda (e)
+(handler-bind ((error #'(lambda (e)
+                          (when (typep e (intern (symbol-name '#:unexpected-failures-error) 'iterate.test))
+                            (format t "~&Catching unexpected failures error.~%")       
+                            (uiop:quit 2))
                           (format t "~&Caught unexpected error ~a~%" e)
                           (uiop:quit 3))))
   (asdf:test-system "iterate")
