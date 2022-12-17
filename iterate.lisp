@@ -1029,13 +1029,18 @@ Evaluate (iterate:display-iterate-clauses) for an overview of clauses"
 		       (error "cond clause ~a is not a list" first-clause)
 		       (car first-clause)))
 	     (thens (cdr first-clause))
-	     (if-form (if (null thens)
-			  (let ((var (gensym)))
-			    `(let ((,var ,test))
-			      (if ,var ,var (cond ,@(cdr stuff)))))
-			  `(if ,test (progn ,@thens) (cond ,@(cdr stuff))))))
+	     (if-form (cond ((null thens)
+                             (let ((var (gensym)))
+                               `(let ((,var ,test))
+                                  (if ,var ,var (cond ,@(cdr stuff))))))
+                            ((eq test t)
+                             (when (cdr stuff)
+                               (error "Garbage after final cond clause: ~s" (cdr stuff)))
+                             `(progn ,@thens))
+                            (t
+                             `(if ,test (progn ,@thens) (cond ,@(cdr stuff)))))))
 	(walk if-form))))
-			    
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
