@@ -11,7 +11,7 @@ variables:
   CCL_IMAGE: clfoundation/ccl
   CCL_TAG: latest
   CLASP_IMAGE: clfoundation/clasp
-  CLASP_TAG: latest
+  CLASP_TAG: b14e329f49998275579926da2a737885ceb2cea7
   CLISP_IMAGE: clfoundation/clisp
   CLISP_TAG: latest
   CMUCL_IMAGE: clfoundation/cmucl
@@ -45,7 +45,7 @@ stages:
     - make test
   artifacts:
     paths:
-      - build/results/$l-test.text
+      - tmp/$l-test.text
   needs: []
 
 ###############################################################################
@@ -55,6 +55,12 @@ stages:
 ABCL regression tests:
   extends: .Regression tests
   image: $ABCL_IMAGE:$ABCL_TAG
+  variables:
+    l: abcl
+
+ABCL 1.9.0 regression tests:
+  extends: .Regression tests
+  image: rpgoldman/abcl:1.9.0
   variables:
     l: abcl
 
@@ -70,12 +76,12 @@ Clasp regression tests:
   variables:
     l: clasp
 
-# dropping because I don't have access to an image with ASDF installed.
-# CLISP regression tests:
-#   extends: .Regression tests
-#   image: $CLISP_IMAGE:$CLISP_TAG
-#   variables:
-#     l: clisp
+CLISP regression tests:
+  extends: .Regression tests
+  image: $CLISP_IMAGE:$CLISP_TAG
+  variables:
+    l: clisp
+  allow_failure: true
 
 CMUCL regression tests:
   extends: .Regression tests

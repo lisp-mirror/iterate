@@ -1,12 +1,12 @@
 (in-package :common-lisp-user)
 
-(require :asdf)
+(require #-clisp :asdf #+clisp "asdf")
 
 (asdf:initialize-output-translations
  `(:output-translations
    (t ,(merge-pathnames (make-pathname
                          :directory '(:relative "test" "cache" :wild-inferiors)
-                         :name :wild :type :wild)
+                         :name :wild :type :wild :version :wild)
                         *load-truename*))
    :ignore-inherited-configuration
    ))
@@ -76,10 +76,8 @@
 
 
 (handler-bind ((error #'(lambda (e)
-                          (when (typep e (intern (symbol-name '#:unexpected-failures-error) 'iterate.test))
-                            (format t "~&Catching unexpected failures error.~%")       
-                            (uiop:quit 2))
-                          (format t "~&Caught unexpected error ~a~%" e)
-                          (uiop:quit 3))))
+                          (if (typep e (intern (symbol-name '#:unexpected-failures-error) 'iterate.test))
+                              (uiop:die 2 "~&Catching unexpected failures error: ~a~%" e)
+                              (uiop:die 3 "~&Caught unexpected error ~a~%" e)))))
   (asdf:test-system "iterate")
   (uiop:quit 0))

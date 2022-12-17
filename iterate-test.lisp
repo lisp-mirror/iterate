@@ -55,12 +55,17 @@
     thereis.finally
     bug/walk.2
     bug/collect-at-beginning
-    #+(or clozure ecl)
+    #+(or clozure ecl clisp cmucl clasp)
     bug/previously-initially.1
     IN-STREAM.2
     #+(or allegro ecl) code-movement.else
     #+(or allegro ecl) code-movement.finally
     #+(or allegro ecl) code-movement.finally-protected
+    #+cmucl DSETQ.3
+    #+cmucl FINDING.SUCH-THAT.NEST.2
+    #+cmucl UNTIL.1 
+    #+cmucl COLLECT.1
+    #+clasp SETF.4
     ))
 
 (deftest dsetq.1
